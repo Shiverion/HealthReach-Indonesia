@@ -1,0 +1,37 @@
+# Large geospatial downloads — fetched via scripts, not committed
+data/raw/flood/*
+data/raw/facilities/*
+data/raw/population_roads/*
+!data/raw/flood/.gitkeep
+!data/raw/facilities/.gitkeep
+!data/raw/population_roads/.gitkeep
+
+data/processed/*
+!data/processed/.gitkeep
+
+# Common geospatial/data formats that belong in raw/ but not in git
+*.tif
+*.tiff
+*.shp
+*.shx
+*.dbf
+*.prj
+*.gpkg
+*.geojson
+*.osm.pbf
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Earthdata / API credentials
+.netrc
+.env
