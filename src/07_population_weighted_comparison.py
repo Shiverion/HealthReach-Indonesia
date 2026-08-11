@@ -23,14 +23,28 @@ THRESHOLDS_MIN = [30, 60, 120]
 
 def load_population_points():
     with rasterio.open(POP_RASTER) as src:
-        data = src.read(1, out_shape=(src.height // AGGREGATION_FACTOR, src.width // AGGREGATION_FACTOR),
-                         resampling=Resampling.sum)
-        data = np.where(data < 0, 0, data)  # nodata sentinel -> 0
-        transform = src.transform * src.transform.scale(AGGREGATION_FACTOR, AGGREGATION_FACTOR)
+        src_data = src.read(1)
+        src_data = np.where(src_data < 0, 0, src_data)  # nodata sentinel -> 0
+
+        out_height = max(1, src.height // AGGREGATION_FACTOR)
+        out_width = max(1, src.width // AGGREGATION_FACTOR)
+        dst_transform = src.transform * src.transform.scale(
+            src.width / out_width, src.height / out_height
+        )
+        data = np.zeros((out_height, out_width), dtype="float64")
+        reproject(
+            source=src_data,
+            destination=data,
+            src_transform=src.transform,
+            src_crs=src.crs,
+            dst_transform=dst_transform,
+            dst_crs=src.crs,
+            resampling=Resampling.sum,
+        )
 
         rows, cols = np.where(data > 0.5)
         pops = data[rows, cols]
-        xs, ys = rasterio.transform.xy(transform, rows, cols)
+        xs, ys = rasterio.transform.xy(dst_transform, rows, cols)
         return np.array(xs), np.array(ys), pops
 
 

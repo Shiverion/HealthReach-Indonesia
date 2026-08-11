@@ -2,7 +2,7 @@
 
 **Working title:** *District-Capacity-Adjusted Healthcare Accessibility Under Flood Disruption in South Kalimantan*
 **Repository / portfolio name:** HealthReach Indonesia
-**Status:** Scoping complete, data feasibility verified. Not yet started.
+**Status:** Phase 1 complete (baseline + interim flood-disrupted accessibility). See `docs/phase1_summary.md` for results. Sentinel-1 substitution (issue #5) still blocked on manual NASA Earthdata auth — needed before any claim about the actual Jan 2021 event, as opposed to the general hazard-zone proxy used so far.
 
 ---
 
