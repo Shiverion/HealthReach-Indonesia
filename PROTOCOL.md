@@ -63,17 +63,17 @@ Do **not** claim "improved research from Oxford" or "first GIS healthcare study 
 | Road network | [Geofabrik OSM Indonesia](https://download.geofabrik.de/asia/indonesia.html) | Free download, actively maintained | Confirmed; rural completeness not yet spot-checked |
 | Population | [WorldPop Indonesia 100m grid](https://hub.worldpop.org/geodata/summary?id=44750) | Free download | Confirmed |
 | Flood hazard (baseline risk) | BNPB [InaRISK GIS server](https://gis.bnpb.go.id/) (`layer_bahaya_banjir`), ArcGIS REST, JSON/GeoJSON | Free, programmatic | Confirmed |
-| **Flood extent (observed, Jan 2021 ground truth)** | NASA MODIS/VIIRS Global Flood Product (MCDWD), reprocessed archive 2003–2025, via [LAADS DAAC](https://www.earthdata.nasa.gov/data/catalog/lancemodis-mcdwd-l3-nrt-6.1) | Free, Earthdata login | Confirmed archive covers the event date range; **cloud cover for the specific Jan 2021 dates not yet checked** |
-| Flood extent backup (cloud-resistant) | Sentinel-1 SAR via NASA [ASF DAAC](https://www.earthdata.nasa.gov/data/platforms/space-based-platforms/sentinel-1) (Vertex) | Free, Earthdata login | Standard approach in Indonesian flood-mapping literature; use if MODIS is cloud-obscured |
+| ~~Flood extent via MODIS/VIIRS~~ | ~~NASA MCDWD, LAADS DAAC~~ | Free, Earthdata login | **Ruled out for this event.** Pulled actual MODIS true-color imagery for Kalsel on Jan 12/15/18/20 2021 — nearly fully cloud-obscured on every date (Jan 15: no land visible at all). Monsoon season, which is why it flooded, is exactly when optical imagery can't see through cloud. Keep as a citation of the general methodology, not as an actual data layer. |
+| **Flood extent (observed, Jan 2021 ground truth) — primary source** | Sentinel-1 SAR via NASA [ASF DAAC](https://www.earthdata.nasa.gov/data/platforms/space-based-platforms/sentinel-1) (Vertex) | Free, Earthdata login | Cloud-penetrating radar, operational since 2014, global coverage — standard approach in the Indonesian flood-mapping literature specifically because of this cloud problem. Not yet pulled an actual scene (needs authenticated ASF Vertex search); high confidence a usable pass exists in-window, confirm before building the pipeline. |
 | Terrain / DEM | NASA SRTM (via Earthdata) | Free | Standard input for AccessMod |
 | **District-level workforce capacity** | Kalsel *Profil Kesehatan 2022*, Tabel 15–17 (`data/raw/kalsel_health_profile/`) + [BPS Kalsel](https://kalsel.bps.go.id/) cross-check | Already downloaded | **Confirmed: kabupaten/kota level only.** No facility-level data — verified by reading the actual tables; "UNIT KERJA" rows are the 13 districts, hospital rows are unfilled template placeholders. |
 | Optional stretch: forecast validation | NASA [GFMS](http://flood.umd.edu/) (IMERG-driven hydrological model) | Free, web + some historical archives | Real-time/historical simulation output could serve as an independent validation point for the Jan 2021 event; not required for core scope |
 
-## 7. Known open risks (check early, before committing further)
+## 7. Known risks — checked
 
-1. **HDX/OSM facility and road completeness in rural South Kalimantan** — unverified. Do a quick facility-count sanity check against the BPS/Dinkes puskesmas totals before building the full pipeline.
-2. **MODIS cloud cover for the actual Jan 2021 flood dates** — the product composites over 1/2/3-day windows to mitigate this, but pull the imagery early to confirm usable coverage; fall back to Sentinel-1 SAR if not.
-3. Preprint status of the primary reference paper (§2) — confirm whether it has since been peer-reviewed before finalizing citations.
+1. **HDX/OSM facility completeness in South Kalimantan — passed.** Live Overpass query: 76 hospital-tagged features vs. 53 official (Dinkes Kalsel 2022); 275 clinic/health-centre features vs. 241 official puskesmas. Same order of magnitude, not a sparse-rural-gap problem. OSM road-network completeness not independently re-verified (Overpass queries for it timed out on public mirrors under load) — re-check once the pipeline is actually being built.
+2. **MODIS cloud cover — failed, plan updated.** Actual imagery pulled for Jan 12/15/18/20 2021 over Kalsel: near-total cloud cover on every date. **Sentinel-1 SAR is now the primary (not backup) source for observed flood extent** — see §6.
+3. **Preprint status — confirmed still unpublished.** The primary reference paper (§2) is still a Research Square preprint as of the most recent check, no journal publication found. Cite as "preprint (Research Square, 2025)"; re-check before the final write-up in case it publishes in the meantime.
 
 ## 8. Tooling
 
