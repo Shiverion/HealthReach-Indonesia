@@ -35,3 +35,6 @@ Thumbs.db
 # Earthdata / API credentials
 .netrc
 .env
+
+# osmnx HTTP response cache
+cache/
