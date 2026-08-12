@@ -175,7 +175,14 @@ nb2 = make_nb([
 nb3 = make_nb([
     md("# 03 — Flood Disruption: Hazard-Zone Proxy vs. Observed Sentinel-1 Extent\n\n"
        "The central methodological comparison of this project. Full discussion in "
-       "`../docs/sentinel1_validated_results.md`."),
+       "`../docs/sentinel1_derived_results.md`.\n\n"
+       "**Note:** an earlier version of this analysis also claimed the observed-vs-proxy "
+       "damage difference was evidence of a network \"chokepoint\" mechanism. That claim "
+       "was tested directly with a randomization null model and did not survive -- see "
+       "notebook `06_robustness_checks_and_retraction.ipynb` and "
+       "`../docs/robustness_checks.md` §7-7b. It is reported there as a retraction, not "
+       "quietly dropped. The proxy-vs-observed comparison itself (this notebook) is "
+       "unaffected and remains this project's most defensible finding."),
     code(
         "import pickle\n"
         "import numpy as np\n"
@@ -262,7 +269,11 @@ nb3 = make_nb([
     md("**Reading this chart:** the Sentinel-1 moderate scenario is the primary "
        "real-world estimate — a measured, plausible impact. The severe scenarios "
        "(both proxy and observed) are network-fragility stress tests, not literal "
-       "population-affected claims; see `../docs/manuscript.md` §5.2 for why."),
+       "population-affected claims; see `../docs/manuscript.md` §5.2 for why. Also see "
+       "that section for why the absolute severe-scenario percentages shown here likely "
+       "overstate disconnection (a pipeline limitation surfaced by `06`'s Null A2 check) "
+       "— the proxy-vs-observed *comparison* is still valid since both sides use the "
+       "same method."),
 ])
 
 # ---------------------------------------------------------------------------
@@ -404,12 +415,163 @@ nb5 = make_nb([
        "as a genuine flood signal rather than SAR noise."),
 ])
 
+# ---------------------------------------------------------------------------
+# 06 — Robustness checks and the retraction
+# ---------------------------------------------------------------------------
+nb6 = make_nb([
+    md("# 06 — Robustness Checks, and a Retraction\n\n"
+       "Three rounds of review, documented in full in `../docs/robustness_checks.md`. "
+       "This notebook walks through the checks with real output: a matched-penalty "
+       "sweep, an edge-overlap sensitivity test, continuous capacity analysis with "
+       "leave-one-out, and two independent null models. **The headline result of this "
+       "notebook is a retraction, not a confirmation** — an early finding that real "
+       "floods hit network \"chokepoints\" did not survive testing and was withdrawn. "
+       "That is reported here the same way the rest of this project reports anything "
+       "else: with the actual numbers, not softened."),
+    code(
+        "import pickle\n"
+        "import numpy as np\n"
+        "import pandas as pd\n"
+        "import matplotlib.pyplot as plt\n"
+        "from pathlib import Path\n\n"
+        "DATA_PROC = Path('../data/processed')"
+    ),
+    md("## Matched-penalty sweep\n\nThe proxy and Sentinel-1 moderate scenarios originally "
+       "used different penalty multipliers (×2.5 vs ×5) — individually defensible, but not "
+       "a controlled comparison. This reruns both at identical multipliers."),
+    code(
+        "sweep = pd.read_csv(DATA_PROC / 'penalty_sensitivity_sweep.csv')\n"
+        "sweep = sweep[sweep['layer'].isin(['proxy', 'sentinel1'])]\n\n"
+        "fig, ax = plt.subplots(figsize=(8, 5))\n"
+        "for layer, color in [('proxy', '#e76f51'), ('sentinel1', '#2a9d8f')]:\n"
+        "    sub = sweep[sweep['layer'] == layer].sort_values('multiplier')\n"
+        "    ax.plot(sub['multiplier'], sub['gap_widening_pp'], marker='o', label=layer, color=color)\n"
+        "ax.set_xlabel('Penalty multiplier')\n"
+        "ax.set_ylabel('Inequality gap widening (pp)')\n"
+        "ax.set_title('Proxy Overstates Gap-Widening at Every Matched Multiplier')\n"
+        "ax.legend()\n"
+        "plt.tight_layout()\n"
+        "plt.show()\n\n"
+        "sweep[['layer', 'multiplier', 'gap_widening_pp']]"
+    ),
+    md("**Result:** the proxy overstates gap-widening by 1.7–2.6× at every multiplier tested. "
+       "The direction (flooding widens the chronic gap) is unanimous across all 8 scenarios — "
+       "the finding got stronger under scrutiny, not weaker."),
+    md("## Edge-overlap sensitivity\n\nDoes the extreme severe-scenario disconnection number "
+       "depend on sampling flood status at a single edge midpoint?"),
+    code(
+        "overlap = pd.read_csv(DATA_PROC / 'edge_overlap_sensitivity.csv')\n"
+        "overlap = overlap[overlap['threshold'] < 1.0]  # >=1.0 is a degenerate case, see robustness_checks.md\n\n"
+        "fig, ax = plt.subplots(figsize=(7, 5))\n"
+        "ax.plot(overlap['threshold'], overlap['largest_component_pct'], marker='o', color='steelblue')\n"
+        "ax.set_xlabel('Overlap threshold (fraction of edge sample points flooded)')\n"
+        "ax.set_ylabel('Largest component remaining (%)')\n"
+        "ax.set_title('Fragmentation Result Is Stable Across Overlap Rules')\n"
+        "ax.set_ylim(0, 15)\n"
+        "plt.tight_layout()\n"
+        "plt.show()"
+    ),
+    md("**Result:** largest-component-% stays flat (9.0–10.4%) across thresholds spanning a "
+       "2× range in edges removed. Not a sampling artifact."),
+    md("## Continuous capacity vs. leave-one-out"),
+    code(
+        "loo = pd.read_csv(DATA_PROC / 'leave_one_out_inequality.csv')\n"
+        "fig, ax = plt.subplots(figsize=(9, 5))\n"
+        "colors = ['crimson' if w <= 0 else 'steelblue' for w in loo['widening_pp']]\n"
+        "ax.barh(loo['excluded'], loo['widening_pp'], color=colors)\n"
+        "ax.set_xlabel('Gap widening (pp) with this district excluded')\n"
+        "ax.set_title(f\"Gap Widened in {(loo['widening_pp']>0).sum()}/{len(loo)} Leave-One-Out Runs\")\n"
+        "ax.axvline(0, color='black', linewidth=0.8)\n"
+        "plt.tight_layout()\n"
+        "plt.show()"
+    ),
+    md("## Null model A — largest connected component\n\n"
+       "**This is the check that produced the retraction.** If real floods hit structurally "
+       "important \"chokepoint\" edges, the real flood should be *more* damaging than the "
+       "same number of edges removed uniformly at random."),
+    code(
+        "null_a = pd.read_csv(DATA_PROC / 'null_model_random_edges.csv')\n"
+        "with open(DATA_PROC / 'null_model_summary.pickle', 'rb') as f:\n"
+        "    summary_a = pickle.load(f)\n\n"
+        "fig, ax = plt.subplots(figsize=(8, 5))\n"
+        "ax.hist(null_a['largest_component_pct'], bins=25, color='steelblue', edgecolor='white',\n"
+        "        label='200 random-edge-removal trials')\n"
+        "ax.axvline(summary_a['observed_largest_pct'], color='crimson', linewidth=2,\n"
+        "            label=f\"observed real flood ({summary_a['observed_largest_pct']:.2f}%)\")\n"
+        "ax.set_xlabel('Largest connected component remaining (%)')\n"
+        "ax.set_ylabel('Trials')\n"
+        "ax.set_title('Real Flood Is LESS Damaging Than Random Removal — Opposite of the Chokepoint Prediction')\n"
+        "ax.legend()\n"
+        "plt.tight_layout()\n"
+        "plt.show()\n\n"
+        "n_trials = summary_a['n_trials']\n"
+        "b_reverse = int((null_a['largest_component_pct'] >= summary_a['observed_largest_pct']).sum())\n"
+        "p_reverse = (b_reverse + 1) / (n_trials + 1)\n"
+        "print(f\"Not one of {n_trials} random trials was as mild as the observed flood.\")\n"
+        "print(f\"Wrong-direction test (observed MORE damaging than random): p = {summary_a['p_value']:.4f} (zero support for this direction)\")\n"
+        "print(f\"Correct-direction test (observed LESS damaging than random): p = {p_reverse:.4f}\")"
+    ),
+    md("**The chokepoint mechanism is retracted, not reframed.** Full reasoning in "
+       "`../docs/robustness_checks.md` §7, including why this p-value must be read "
+       "carefully (the naive p=1.0000 for \"observed more damaging than random\" means "
+       "zero support for that direction, not proof against it — the correctly-specified "
+       "reverse-direction test gives empirical p≈0.005)."),
+    md("## Null A2 — confirms A with an independent metric\n\n"
+       "Largest-component size isn't the same thing as population losing healthcare "
+       "access specifically. This reruns the identical randomization with a different "
+       "damage metric: population disconnected from *any* facility, not just generic "
+       "graph fragmentation."),
+    code(
+        "null_a2 = pd.read_csv(DATA_PROC / 'null_model_a2_facility_access.csv')\n"
+        "with open(DATA_PROC / 'null_model_a2_summary.pickle', 'rb') as f:\n"
+        "    summary_a2 = pickle.load(f)\n\n"
+        "fig, ax = plt.subplots(figsize=(8, 5))\n"
+        "ax.hist(null_a2['pop_disconnected_pct'], bins=25, color='seagreen', edgecolor='white',\n"
+        "        label='200 random-edge-removal trials')\n"
+        "ax.axvline(summary_a2['observed_pct'], color='crimson', linewidth=2,\n"
+        "            label=f\"observed real flood ({summary_a2['observed_pct']:.2f}%)\")\n"
+        "ax.set_xlabel('% of population disconnected from all facilities')\n"
+        "ax.set_ylabel('Trials')\n"
+        "ax.set_title('Independent Metric, Same Conclusion: Random Removal Is Worse')\n"
+        "ax.legend()\n"
+        "plt.tight_layout()\n"
+        "plt.show()\n\n"
+        "print(f\"Observed ({summary_a2['observed_pct']:.1f}%) sits BELOW the minimum of all \"\n"
+        "      f\"{summary_a2['n_trials']} random trials (min={summary_a2['trial_min']:.1f}%).\")\n"
+        "print(f\"Empirical p (correct direction) ~= {summary_a2['p_reverse']:.4f}\")"
+    ),
+    md("**This confirms Null A rather than complicating it.** Generic network fragmentation "
+       "and healthcare-specific disconnection could have diverged — they didn't. Both "
+       "metrics agree the real flood is less disruptive than random removal.\n\n"
+       "One more thing surfaced while building this check, reported rather than quietly "
+       "fixed: the observed value here (68.65%) differs from the \"94.0% disconnected\" "
+       "figure quoted as the severe-scenario headline elsewhere in this project. Both are "
+       "computed correctly — they answer different questions. The headline pipeline paths "
+       "only within the single largest post-disruption fragment; this check credits any "
+       "fragment with its own facility. See `../docs/robustness_checks.md` §7b and "
+       "`../docs/manuscript.md` §5.2 for the full explanation. The proxy-vs-observed and "
+       "severe-vs-moderate *comparisons* remain valid either way, since both sides of each "
+       "comparison use the same method — it's the absolute percentages that should be read "
+       "as directional, not final."),
+    md("## What actually survived this review process\n\n"
+       "1. **Chronic inequality** — solid, unaffected by anything in this notebook.\n"
+       "2. **Disaster amplification, and the proxy overstating its magnitude** — strengthened "
+       "by the matched-penalty sweep.\n"
+       "3. **The chokepoint mechanism** — retracted. Two independent null models rejected it, "
+       "not just one.\n\n"
+       "The empirical fact that motivated the retracted finding — the real flood disconnects "
+       "more of the population from facilities than the proxy despite affecting fewer roads — "
+       "is still true and still unexplained. That's an open question for future work, stated "
+       "as one, not dressed up as an answer."),
+])
+
 for name, nb in [
     ("01_study_area_and_data_overview.ipynb", nb1),
     ("02_baseline_accessibility_model.ipynb", nb2),
     ("03_flood_disruption_proxy_vs_observed.ipynb", nb3),
     ("04_capacity_index_and_inequality.ipynb", nb4),
     ("05_sentinel1_sar_processing.ipynb", nb5),
+    ("06_robustness_checks_and_retraction.ipynb", nb6),
 ]:
     path = NB_DIR / name
     with open(path, "w", encoding="utf-8") as f:
