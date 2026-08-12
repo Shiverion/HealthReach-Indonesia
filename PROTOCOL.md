@@ -1,8 +1,8 @@
 # Research Protocol — HealthReach Indonesia
 
-**Working title:** *District-Capacity-Adjusted Healthcare Accessibility Under Flood Disruption in South Kalimantan*
+**Working title:** *Beyond Proximity: Capacity-Stratified Healthcare Accessibility Under Flood Disruption in South Kalimantan*
 **Repository / portfolio name:** HealthReach Indonesia
-**Status:** Phase 1 + Phase 2 complete, and validated against the real Jan 2021 event via Sentinel-1 SAR (issue #5 closed). See `docs/sentinel1_validated_results.md` for the primary, validated results — `docs/phase1_summary.md` and `docs/phase2_summary.md` are kept for methodological transparency (interim BNPB hazard-zone proxy results, and how they differed from the real-event numbers).
+**Status:** Analysis complete, including a review pass that caught and fixed three substantive issues (facility undercount, a disruption-scenario bug, a chokepoint-finding audit — see `docs/robustness_checks.md`). Primary write-up: `docs/manuscript.md`. Current numbers: `docs/sentinel1_validated_results.md`. `docs/phase1_summary.md` and `docs/phase2_summary.md` are kept for methodological transparency (earlier interim results, both from the BNPB hazard-zone proxy and pre-review-fix).
 
 ---
 
@@ -10,7 +10,7 @@
 
 This is an **independent replication and extension**, not a novel-from-scratch model. The claim to make in any write-up or application material:
 
-> Independent replication of disaster-aware geographic healthcare accessibility methodology (Macharia et al., KEMRI-Wellcome/Oxford), extended to Indonesia with district-level healthcare workforce capacity weighting, validated against a real documented flood event.
+> Independent replication of disaster-aware geographic healthcare accessibility methodology (Macharia et al., KEMRI-Wellcome/Oxford), extended to Indonesia with district-level healthcare workforce capacity stratification, validated against a real documented flood event.
 
 Do **not** claim "improved research from Oxford" or "first GIS healthcare study in Indonesia" — both are false claims that a knowledgeable reviewer will catch (see §4, prior art).
 
