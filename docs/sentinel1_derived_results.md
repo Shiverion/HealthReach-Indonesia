@@ -1,4 +1,6 @@
-# Validated Results — Real Sentinel-1 Observed Flood Extent (Jan 2021 Event)
+# Sentinel-1-Derived Results — Real Observed Flood Extent (Jan 2021 Event)
+
+**Vocabulary note:** this document uses *derived* (computed from Sentinel-1 data) and *sanity-checked* (agrees qualitatively with known geography) deliberately, not *validated* (which would require comparison against an independent flood product — Copernicus EMS, UNOSAT, or similar — not yet done). See `docs/robustness_checks.md` for the full reasoning.
 
 **Status:** Complete, and corrected after review — see `docs/robustness_checks.md` for the three fixes applied (facility completeness 90→365, proxy-moderate scenario definition, chokepoint bridge-artifact audit) and why they mattered. This document reflects the corrected numbers; it supersedes the first-draft figures that circulated briefly before review.
 
@@ -10,7 +12,7 @@ This supersedes the interim BNPB hazard-zone proxy as the primary finding for th
 2. Raw GRD georeferenced via embedded ground control points (no direct affine transform on raw GRD products), cropped to the flood-affected AOI.
 3. Water classified per-scene via Otsu thresholding on log-scaled backscatter intensity.
 4. New flood extent = event water AND NOT baseline water.
-5. **Visually validated:** flooding tracks the Barito river corridor and concentrates near the delta/city area; the mountainous Meratus range shows negligible flooded area.
+5. **Visually sanity-checked:** flooding tracks the Barito river corridor and concentrates near the delta/city area; the mountainous Meratus range shows negligible flooded area.
 6. Two disruption brackets, defined identically in *operation* to the proxy brackets in `src/06_flood_disruption.py` (fixed per `docs/robustness_checks.md` §2):
    - **Severe:** flooded road segments removed (impassable)
    - **Moderate:** flooded segments penalized 5× travel time, nothing removed — connectivity unchanged from baseline by construction

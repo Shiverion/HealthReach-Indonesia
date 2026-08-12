@@ -18,7 +18,7 @@ South Kalimantan, Indonesia is a strong setting for this question. It experience
 
 **Primary reproduction target:** Macharia et al., *"Impact analysis of flood-induced changes in geographical accessibility and coverage to healthcare in both public and private sector, Kenya"* (Research Square preprint, 2025) — establishes the baseline-vs-disrupted geographic accessibility methodology this study reproduces.
 
-**Prior art in Indonesia, explicitly acknowledged:** HeiGIT's *Flood Impact Assessment on Road Network and Healthcare Access... Jakarta, Indonesia* (AGILE-GISS, 2021) applies the same genre of analysis to the 2013 Jakarta flood. This study's contribution is not "the first accessibility study in Indonesia" but the combination of a new region and event, capacity stratification, and validated observed-extent disruption modeling with an explicit comparison against the more commonly-used hazard-proxy approach.
+**Prior art in Indonesia, explicitly acknowledged:** HeiGIT's *Flood Impact Assessment on Road Network and Healthcare Access... Jakarta, Indonesia* (AGILE-GISS, 2021) applies the same genre of analysis to the 2013 Jakarta flood. This study's contribution is not "the first accessibility study in Indonesia" but the combination of a new region and event, capacity stratification, and event-specific Sentinel-1-derived disruption modeling, compared directly against the more commonly-used hazard-proxy approach under matched conditions (§3.6, §5.1).
 
 ## 3. Data and methods
 
@@ -58,7 +58,7 @@ Two disruption layers were used deliberately, so the comparison itself is part o
 
 **Proxy (BNPB InaRISK hazard classification).** BNPB's flood-hazard MapServer exposes only a rendered RGBA raster, reverse-engineered via color-threshold classification into three bins (low/medium/high). Represents flood-*prone* area accumulated over many years, not any single event's footprint.
 
-**Observed (Sentinel-1 SAR).** A Sentinel-1 GRD pair (baseline Dec 15, 2020; event Jan 20, 2021; matched relative orbit) was warped to EPSG:4326 via embedded GCPs, cropped to the AOI, and water classified per-scene via Otsu thresholding on log-scaled VV backscatter. New flood extent = event water minus baseline water. Visually validated against known geography (river-corridor concentration, negligible flooding on the mountainous AOI edge).
+**Observed (Sentinel-1 SAR).** A Sentinel-1 GRD pair (baseline Dec 15, 2020; event Jan 20, 2021; matched relative orbit) was warped to EPSG:4326 via embedded GCPs, cropped to the AOI, and water classified per-scene via Otsu thresholding on log-scaled VV backscatter. New flood extent = event water minus baseline water. Visually sanity-checked against known geography (river-corridor concentration, negligible flooding on the mountainous AOI edge) — this is a qualitative check, not validation against an independent flood product, which has not been performed (§5.2).
 
 **Disruption brackets, defined identically in operation for both layers** (a fix from an earlier draft where the proxy-moderate scenario mixed edge removal and penalty inconsistently — see `docs/robustness_checks.md` §2):
 - **Severe:** flagged road segments removed (impassable) — a network-fragility stress test
@@ -124,7 +124,7 @@ Both disruption layers agree on direction but disagree on magnitude and, critica
 
 ### 5.3 Contribution
 
-Relative to the reproduced methodology: (1) a district-level capacity-stratified view of accessibility, explicitly scoped as stratification rather than a claim of capacity-integrated modeling; (2) a validated comparison between hazard-proxy and observed-extent disruption modeling for the same event, showing the proxy approach can produce a materially different and confounded inequality finding, which is this project's cleanest and most defensible result; (3) evidence, appropriately hedged for a single case, consistent with a network-topology mechanism where chokepoint concentration matters more than areal extent, audited against a specific plausible artifact explanation rather than asserted at face value.
+Relative to the reproduced methodology: (1) a district-level capacity-stratified view of accessibility, explicitly scoped as stratification rather than a claim of capacity-integrated modeling; (2) a matched-conditions comparison between hazard-proxy and observed-extent disruption modeling for the same event (same population, facilities, network, and penalty multipliers — only the flood representation differs), showing the proxy approach systematically overstates inequality-widening relative to observed data across every multiplier tested, which is this project's cleanest and most defensible result; (3) evidence, appropriately hedged for a single case, consistent with a network-topology mechanism where chokepoint concentration matters more than areal extent, audited against a specific plausible artifact explanation and an edge-overlap-rule sensitivity check, both of which it survives.
 
 ## 6. Data and code availability
 

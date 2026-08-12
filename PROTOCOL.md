@@ -2,7 +2,7 @@
 
 **Working title:** *Beyond Proximity: Capacity-Stratified Healthcare Accessibility Under Flood Disruption in South Kalimantan*
 **Repository / portfolio name:** HealthReach Indonesia
-**Status:** Analysis complete, including a review pass that caught and fixed three substantive issues (facility undercount, a disruption-scenario bug, a chokepoint-finding audit — see `docs/robustness_checks.md`). Primary write-up: `docs/manuscript.md`. Current numbers: `docs/sentinel1_validated_results.md`. `docs/phase1_summary.md` and `docs/phase2_summary.md` are kept for methodological transparency (earlier interim results, both from the BNPB hazard-zone proxy and pre-review-fix).
+**Status:** Analysis complete, including a review pass that caught and fixed three substantive issues (facility undercount, a disruption-scenario bug, a chokepoint-finding audit — see `docs/robustness_checks.md`). Primary write-up: `docs/manuscript.md`. Current numbers: `docs/sentinel1_derived_results.md`. `docs/phase1_summary.md` and `docs/phase2_summary.md` are kept for methodological transparency (earlier interim results, both from the BNPB hazard-zone proxy and pre-review-fix).
 
 ---
 
@@ -10,7 +10,7 @@
 
 This is an **independent replication and extension**, not a novel-from-scratch model. The claim to make in any write-up or application material:
 
-> Independent replication of disaster-aware geographic healthcare accessibility methodology (Macharia et al., KEMRI-Wellcome/Oxford), extended to Indonesia with district-level healthcare workforce capacity stratification, validated against a real documented flood event.
+> Independent replication of disaster-aware geographic healthcare accessibility methodology (Macharia et al., KEMRI-Wellcome/Oxford), extended to Indonesia with district-level healthcare workforce capacity stratification, applied to a real documented flood event via Sentinel-1-derived disruption modeling.
 
 Do **not** claim "improved research from Oxford" or "first GIS healthcare study in Indonesia" — both are false claims that a knowledgeable reviewer will catch (see §4, prior art).
 

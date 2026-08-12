@@ -1,11 +1,11 @@
 # HealthReach Indonesia
 
-Independent replication and extension of disaster-aware geographic healthcare accessibility methodology (Macharia et al., KEMRI-Wellcome/Oxford), applied to the January 2021 South Kalimantan floods, with district-level healthcare workforce capacity stratification and disruption validated against real Sentinel-1 SAR-observed flood extent rather than a static hazard-risk proxy.
+Independent replication and extension of disaster-aware geographic healthcare accessibility methodology (Macharia et al., KEMRI-Wellcome/Oxford), applied to the January 2021 South Kalimantan floods, with district-level healthcare workforce capacity stratification and disruption modeled from real Sentinel-1 SAR-observed flood extent rather than a static hazard-risk proxy.
 
 **Status: analysis complete.** Read the results in this order:
 
 1. [`docs/manuscript.md`](docs/manuscript.md) — the write-up: methods, results, discussion, limitations. Start here.
-2. [`docs/sentinel1_validated_results.md`](docs/sentinel1_validated_results.md) — current numbers in full detail.
+2. [`docs/sentinel1_derived_results.md`](docs/sentinel1_derived_results.md) — current numbers in full detail.
 3. [`docs/robustness_checks.md`](docs/robustness_checks.md) — three issues a review pass caught (a 4x facility undercount, a disruption-scenario definition bug, a chokepoint-finding artifact audit) and how each was resolved. Worth reading on its own if you care about how this project handles being wrong.
 4. [`notebooks/`](notebooks) — the same analysis, interactively, with maps and charts.
 
@@ -23,7 +23,7 @@ README.md                      this file
 
 docs/
   manuscript.md                 the write-up — start here
-  sentinel1_validated_results.md   current, correct numbers
+  sentinel1_derived_results.md   current, correct numbers
   robustness_checks.md          three review findings and their fixes
   phase1_summary.md             superseded (kept for audit trail — see banner in the file)
   phase2_summary.md             superseded (kept for audit trail — see banner in the file)

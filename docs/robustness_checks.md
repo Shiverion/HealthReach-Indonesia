@@ -32,6 +32,54 @@ This also makes the proxy-vs-observed comparison (the project's cleanest contrib
 
 **Honest residual caveat:** OSM bridge-tagging completeness in rural Indonesia is inconsistent (a known general data-quality pattern, not specific to this check), so under-tagged real bridges among the 90.2% non-bridge-tagged set cannot be fully ruled out without imagery-based manual verification, which was not performed exhaustively here. This is flagged as follow-up work, not resolved.
 
+## 4. Matched penalty sweep: is the proxy-vs-observed comparison actually controlled?
+
+**The concern:** the proxy-moderate scenario used a ×2.5 penalty, the Sentinel-1-moderate scenario used ×5. Individually defensible, but this project's central claim is that *changing flood representation* changes the accessibility conclusion — and with two different penalty multipliers, outcome = f(footprint, penalty) has two things varying at once. Any difference between proxy and observed could be footprint, or could be the multiplier, or both.
+
+**The fix:** `src/13_penalty_sensitivity_sweep.py` runs both layers at the identical multiplier set (×2, ×2.5, ×5, ×10), isolating footprint as the only variable that differs between proxy and observed.
+
+**Result — the finding is not only preserved but sharper than before:**
+
+| Multiplier | Proxy gap-widening | Observed gap-widening | Proxy / Observed ratio |
+|---|---|---|---|
+| ×2 | +1.58pp | +0.62pp | 2.57× |
+| ×2.5 | +2.37pp | +0.95pp | 2.49× |
+| ×5 | +4.83pp | +2.37pp | 2.03× |
+| ×10 | +8.26pp | +4.84pp | 1.71× |
+
+At **every** matched multiplier, the hazard-zone proxy overstates how much flood disruption widens the underserved-vs-well-served accessibility gap, by a factor of roughly 1.7–2.6× relative to the real observed-extent data. The ratio isn't perfectly constant, but the direction is unanimous across all four multipliers tested — this is a controlled, quantitative version of "representation matters," not just a qualitative comparison at one arbitrarily-chosen setting each. Full table: `data/processed/penalty_sensitivity_sweep.csv`.
+
+Separately, the gap-widening direction itself (flooding widens the chronic gap) held at every multiplier for both layers — 8/8 scenarios showed positive widening, none reversed.
+
+## 5. Edge-overlap sensitivity: is the 94% severe-disconnection number an artifact of midpoint sampling?
+
+**The concern:** flood status was sampled at a single point (each edge's midpoint). A long edge with a small flooded fraction could be flagged as entirely impassable, inflating the severe scenario's fragmentation.
+
+**Context that lowers the prior risk:** graph edges are consecutive OSM node-pairs, not whole ways, so most are already short (median 22m; 90th percentile 78.5m; only 1.1% exceed 200m) — checked empirically before assuming the concern was as large as the illustrative "800m edge" scenario suggested.
+
+**The check:** `src/14_edge_overlap_sensitivity.py` resamples each edge at 5 points along its length and reruns the severe scenario at overlap thresholds of >0%, >25%, >50%, >75%.
+
+**Result:**
+
+| Overlap threshold | Edges removed | Largest component |
+|---|---|---|
+| >0% (any point) | 81,578 | 9.0% |
+| >25% | 66,863 | 9.2% |
+| >50% | 53,562 | 9.3% |
+| >75% | 42,674 | 10.4% |
+
+The largest-component percentage is essentially flat across thresholds spanning a 2× range in edges removed (81,578 → 42,674). This is close to the best possible outcome for this check: the extreme fragmentation result is not an implementation artifact of the flood-overlap sampling rule. (A fifth threshold, ">100%", was included in the original run but is a degenerate case in the script's `frac > threshold` logic — never true when the maximum possible fraction is 1.0 — and is excluded from this table as a coding edge case, not a finding.)
+
+## 6. Continuous capacity analysis, leave-one-out, and workforce denominator sensitivity
+
+**The concern (n=13, median split):** binarizing a continuous variable (workforce density) into two classes at the median throws away information and risks being driven by whichever districts sit near the cutoff or by a single influential district (Kota Banjarmasin was already known to behave unusually).
+
+**Continuous check:** Spearman correlation between clinical-staff density and 60-min accessibility change across all 13 districts: **ρ = 0.549, p = 0.052** (n=13). Treated as descriptive triangulation alongside the scatter plot (`data/processed/capacity_vs_access_change_scatter.png`), not as a significance claim to lean on — at n=13 a fitted model would mostly cosplay as statistical power, so none was fit.
+
+**Leave-one-district-out check:** the underserved-vs-well-served gap-widening finding was recomputed 13 times, each time excluding one district. **The gap widened (direction preserved) in 13/13 runs**, with the widening estimate ranging from +1.10pp to +2.93pp (full sample: +2.37pp) — no single district, including Barito Kuala (the most extreme individual case) or Kota Banjarmasin, drives the result or reverses it. Full table: `data/processed/leave_one_out_inequality.csv`.
+
+**Workforce denominator sensitivity:** the capacity index used WorldPop 2020 population as the denominator against 2022 workforce counts. The source document (Profil Kesehatan 2022) turned out to have its own per-kabupaten 2022 census population (Gambar 1.5, read visually after confirming it wasn't in an extractable table — same situation as Tabel 13). Recomputing capacity with the matched-year BPS 2022 population: **2 of 13 districts flip classification** (Tapin underserved→well-served, Hulu Sungai Utara well-served→underserved), a real but modest sensitivity (11/13 stable). Recomputing the aggregate inequality finding with the BPS-based classification: baseline gap 17.19→17.42pp, widening 2.37→2.30pp — **the finding is essentially unchanged** despite the reclassification. Barito Kuala, the sharpest single data point in the write-up, stays "underserved" under both population sources.
+
 ## What this means for the write-up
 
-All three issues are addressed, not merely acknowledged: facilities were re-extracted and every downstream number recomputed; the proxy-moderate scenario was fixed and re-verified against graph theory directly; the chokepoint finding was audited against an alternative artifact explanation and found to survive it, with the residual uncertainty stated plainly rather than glossed over.
+Two rounds of review, seven issues total, all addressed rather than merely acknowledged. The first round caught outright errors (facility undercount, a scenario-definition bug). The second round caught something harder — claims that were individually defensible but not yet earned at the confidence level they were stated with (an uncontrolled comparison, an overclaimed "validated," an unchecked small-n binarization, an untested extreme result). Every check either strengthened a finding (the matched-penalty sweep turned a qualitative comparison into a controlled, quantitative one) or left it intact within an honestly-reported margin (leave-one-out, the edge-overlap rule, the workforce denominator). Where a check could have broken a claim, the intent was to report that outcome too, not to keep testing until a favorable result appeared.
