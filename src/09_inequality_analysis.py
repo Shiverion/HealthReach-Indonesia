@@ -60,8 +60,8 @@ def main():
     pts["snap_node_idx"] = idx
     pts["snap_ok"] = dist <= MAX_SNAP_DIST_DEG
 
-    # S1 (Sentinel-1 observed extent) is the primary/validated comparison -- see
-    # docs/sentinel1_validated_results.md. Proxy scenarios kept alongside for the
+    # S1 (Sentinel-1 observed extent) is the primary, event-specific comparison -- see
+    # docs/sentinel1_derived_results.md. Proxy scenarios kept alongside for the
     # proxy-vs-observed methodological comparison (docs/manuscript.md §5.1).
     scenarios = {
         "baseline": DATA_PROC / "baseline_travel_time.pickle",

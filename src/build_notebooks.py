@@ -269,11 +269,13 @@ nb3 = make_nb([
     md("**Reading this chart:** the Sentinel-1 moderate scenario is the primary "
        "real-world estimate — a measured, plausible impact. The severe scenarios "
        "(both proxy and observed) are network-fragility stress tests, not literal "
-       "population-affected claims; see `../docs/manuscript.md` §5.2 for why. Also see "
-       "that section for why the absolute severe-scenario percentages shown here likely "
-       "overstate disconnection (a pipeline limitation surfaced by `06`'s Null A2 check) "
-       "— the proxy-vs-observed *comparison* is still valid since both sides use the "
-       "same method."),
+       "population-affected claims; see `../docs/manuscript.md` §5.2 for why. The "
+       "severe-scenario percentages shown here are the corrected figures: an earlier "
+       "version of this pipeline had a pathing bug (Dijkstra restricted to the largest "
+       "post-disruption fragment only), surfaced by `06`'s Null A2 check and fixed before "
+       "these numbers were computed — see `../docs/robustness_checks.md` §7c. The "
+       "proxy-vs-observed *comparison* direction (68.6% > 51.6% population disconnected) "
+       "survives the fix unchanged."),
 ])
 
 # ---------------------------------------------------------------------------
@@ -284,7 +286,7 @@ nb4 = make_nb([
        "WHO SDG 3.c.1-style clinical workforce density (doctors + nurses + midwives "
        "per 10,000 population) per kabupaten, and whether flood disruption hit "
        "underserved districts harder. Full discussion in `../docs/phase2_summary.md` "
-       "and `../docs/sentinel1_validated_results.md`."),
+       "and `../docs/sentinel1_derived_results.md`."),
     code(
         "import numpy as np\n"
         "import geopandas as gpd\n"
@@ -408,7 +410,7 @@ nb5 = make_nb([
         "plt.tight_layout()\n"
         "plt.show()"
     ),
-    md("**Visual validation:** flooding concentrates tightly along the Barito river "
+    md("**Visual sanity check:** flooding concentrates tightly along the Barito river "
        "corridor and the low-lying delta near Banjarmasin, while the mountainous "
        "Meratus range (east side of the AOI) shows negligible flooded area — the "
        "physically expected pattern, and the basis for treating this classification "
@@ -420,14 +422,16 @@ nb5 = make_nb([
 # ---------------------------------------------------------------------------
 nb6 = make_nb([
     md("# 06 — Robustness Checks, and a Retraction\n\n"
-       "Three rounds of review, documented in full in `../docs/robustness_checks.md`. "
+       "Four rounds of review, documented in full in `../docs/robustness_checks.md`. "
        "This notebook walks through the checks with real output: a matched-penalty "
        "sweep, an edge-overlap sensitivity test, continuous capacity analysis with "
        "leave-one-out, and two independent null models. **The headline result of this "
        "notebook is a retraction, not a confirmation** — an early finding that real "
        "floods hit network \"chokepoints\" did not survive testing and was withdrawn. "
-       "That is reported here the same way the rest of this project reports anything "
-       "else: with the actual numbers, not softened."),
+       "Building the second null model (A2) also surfaced a genuine pathing bug in the "
+       "severe-scenario pipeline, fixed and re-tested (§7c) — the fix and its outcome "
+       "are reported below alongside the retraction, the same way the rest of this "
+       "project reports anything else: with the actual numbers, not softened."),
     code(
         "import pickle\n"
         "import numpy as np\n"
@@ -543,16 +547,21 @@ nb6 = make_nb([
     md("**This confirms Null A rather than complicating it.** Generic network fragmentation "
        "and healthcare-specific disconnection could have diverged — they didn't. Both "
        "metrics agree the real flood is less disruptive than random removal.\n\n"
-       "One more thing surfaced while building this check, reported rather than quietly "
-       "fixed: the observed value here (68.65%) differs from the \"94.0% disconnected\" "
-       "figure quoted as the severe-scenario headline elsewhere in this project. Both are "
-       "computed correctly — they answer different questions. The headline pipeline paths "
-       "only within the single largest post-disruption fragment; this check credits any "
-       "fragment with its own facility. See `../docs/robustness_checks.md` §7b and "
-       "`../docs/manuscript.md` §5.2 for the full explanation. The proxy-vs-observed and "
-       "severe-vs-moderate *comparisons* remain valid either way, since both sides of each "
-       "comparison use the same method — it's the absolute percentages that should be read "
-       "as directional, not final."),
+       "One more thing surfaced while building this check, and it turned out to be more "
+       "than a discrepancy to document: the observed value here (68.65%) originally didn't "
+       "match the \"94.0% disconnected\" figure the severe-scenario headline pipeline "
+       "reported for the same real scenario. Digging into why found a real pathing bug — "
+       "the headline pipeline restricted Dijkstra to the single largest post-disruption "
+       "fragment, silently miscounting population stranded in a smaller-but-facility-served "
+       "fragment as disconnected. `networkx` handles disconnected graphs correctly on its "
+       "own, so the fix was to remove that restriction. Fixed in "
+       "`../src/06_flood_disruption.py` and `../src/11_flood_disruption_sentinel1.py`, "
+       "rerun end to end: the corrected headline figure is now **68.6%**, matching this "
+       "check's independently-computed 68.65% almost exactly. See "
+       "`../docs/robustness_checks.md` §7b–§7c for the full account. The core "
+       "proxy-vs-observed comparison survives the correction (68.6% > 51.6%, both "
+       "corrected) — smaller in magnitude than the original buggy 94.0%/74.0% figures, "
+       "but the same direction."),
     md("## What actually survived this review process\n\n"
        "1. **Chronic inequality** — solid, unaffected by anything in this notebook.\n"
        "2. **Disaster amplification, and the proxy overstating its magnitude** — strengthened "

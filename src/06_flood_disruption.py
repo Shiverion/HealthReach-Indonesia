@@ -3,8 +3,8 @@
 Interim methodology note (see PROTOCOL.md): this uses the BNPB *hazard* layer
 (a general multi-year risk classification) as a proxy for disruption, not
 Sentinel-1 *observed* flood extent for the actual Jan 2021 event -- see
-src/11_flood_disruption_sentinel1.py for the validated real-event scenario.
-This proxy-based scenario is kept for methodological comparison (see
+src/11_flood_disruption_sentinel1.py for the event-specific Sentinel-1-derived
+scenario. This proxy-based scenario is kept for methodological comparison (see
 docs/manuscript.md §5.1 -- the proxy-vs-observed comparison is itself a
 result, not just a discarded first attempt).
 
@@ -75,16 +75,26 @@ def run_scenario(G, facilities, edges, disrupted_mask, mode, out_time, out_edges
         gpd.GeoDataFrame(affected_rows, crs="EPSG:4326").to_file(out_edges, driver="GeoJSON")
         print(f"  [ok] flood-affected edges -> {out_edges}")
 
+    # Largest-component-% is reported as a separate NETWORK FRAGMENTATION statistic
+    # only -- it must not gate which nodes get pathed. A population pocket stranded
+    # in a smaller (non-largest) fragment that retains its own local facility still
+    # has real healthcare access; restricting Dijkstra to G_main silently miscounted
+    # it as disconnected. Fixed per docs/robustness_checks.md #7b -- this was a
+    # measurement-definition bug in the severe pipeline, not just an interpretation
+    # caveat, since nx.multi_source_dijkstra_path_length already handles disconnected
+    # graphs correctly on its own (a node unreachable from every source is simply
+    # absent from the result; a node sharing ANY component with a source gets a
+    # correct within-component distance, regardless of whether that's the largest
+    # component).
     components = sorted(nx.connected_components(G_scenario), key=len, reverse=True)
-    G_main = G_scenario.subgraph(components[0]).copy()
-    print(f"  [info] largest component: {len(components[0])} nodes "
+    print(f"  [info] largest component (fragmentation stat): {len(components[0])} nodes "
           f"({100*len(components[0])/G.number_of_nodes():.1f}% of original graph)")
 
     sources = set(zip(facilities["snap_lon"], facilities["snap_lat"]))
-    sources = {s for s in sources if s in G_main}
-    print(f"  [info] {len(sources)} facility source nodes reachable")
+    sources = {s for s in sources if s in G_scenario}
+    print(f"  [info] {len(sources)} facility source nodes present in the (possibly fragmented) graph")
 
-    travel_time = nx.multi_source_dijkstra_path_length(G_main, sources, weight="time_min")
+    travel_time = nx.multi_source_dijkstra_path_length(G_scenario, sources, weight="time_min")
     times = sorted(travel_time.values())
     print(f"  [info] travel time (min) — median={statistics.median(times):.1f}, "
           f"p90={times[int(0.9*len(times))]:.1f}, max={max(times):.1f}")

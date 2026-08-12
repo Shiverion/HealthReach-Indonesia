@@ -63,16 +63,21 @@ def run_scenario(G, facilities, edges, flooded_mask, mode, out_time, out_edges=N
         gpd.GeoDataFrame(affected_rows, crs="EPSG:4326").to_file(out_edges, driver="GeoJSON")
         print(f"  [ok] flood-affected edges -> {out_edges}")
 
+    # Largest-component-% is a separate NETWORK FRAGMENTATION statistic only -- it
+    # must not gate which nodes get pathed. See src/06_flood_disruption.py for the
+    # full explanation (docs/robustness_checks.md #7b): restricting Dijkstra to the
+    # largest component silently miscounted population in smaller, still-facility-
+    # containing fragments as disconnected. nx.multi_source_dijkstra_path_length
+    # already handles disconnected graphs correctly without this restriction.
     components = sorted(nx.connected_components(G_scenario), key=len, reverse=True)
-    G_main = G_scenario.subgraph(components[0]).copy()
-    print(f"  [info] largest component: {len(components[0])} nodes "
+    print(f"  [info] largest component (fragmentation stat): {len(components[0])} nodes "
           f"({100*len(components[0])/G.number_of_nodes():.1f}% of original graph)")
 
     sources = set(zip(facilities["snap_lon"], facilities["snap_lat"]))
-    sources = {s for s in sources if s in G_main}
-    print(f"  [info] {len(sources)} facility source nodes reachable")
+    sources = {s for s in sources if s in G_scenario}
+    print(f"  [info] {len(sources)} facility source nodes present in the (possibly fragmented) graph")
 
-    travel_time = nx.multi_source_dijkstra_path_length(G_main, sources, weight="time_min")
+    travel_time = nx.multi_source_dijkstra_path_length(G_scenario, sources, weight="time_min")
     times = sorted(travel_time.values())
     print(f"  [info] travel time (min) — median={statistics.median(times):.1f}, "
           f"p90={times[int(0.9*len(times))]:.1f}, max={max(times):.1f}")

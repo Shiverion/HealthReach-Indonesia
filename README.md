@@ -6,7 +6,7 @@ Independent replication and extension of disaster-aware geographic healthcare ac
 
 1. [`docs/manuscript.md`](docs/manuscript.md) — the write-up: methods, results, discussion, limitations. Start here.
 2. [`docs/sentinel1_derived_results.md`](docs/sentinel1_derived_results.md) — current numbers in full detail.
-3. [`docs/robustness_checks.md`](docs/robustness_checks.md) — issues caught across two rounds of review (a 4x facility undercount, a disruption-scenario bug, and a set of sensitivity checks) and how each was resolved. One of those checks didn't just refine a finding, it disproved it — see §7. Worth reading on its own if you care about how this project handles being wrong.
+3. [`docs/robustness_checks.md`](docs/robustness_checks.md) — issues caught across four rounds of review (a 4x facility undercount, a disruption-scenario bug, a set of sensitivity checks, and a severe-pipeline pathing bug) and how each was resolved. One of those checks didn't just refine a finding, it disproved it — see §7. Worth reading on its own if you care about how this project handles being wrong.
 4. [`notebooks/`](notebooks) — the same analysis, interactively, with maps and charts.
 
 ## Two findings and one retraction
@@ -24,7 +24,7 @@ README.md                      this file
 docs/
   manuscript.md                 the write-up — start here
   sentinel1_derived_results.md   current, correct numbers
-  robustness_checks.md          three review findings and their fixes
+  robustness_checks.md          four rounds of review findings and their fixes
   phase1_summary.md             superseded (kept for audit trail — see banner in the file)
   phase2_summary.md             superseded (kept for audit trail — see banner in the file)
   literature/                   (empty placeholder for reference papers)
