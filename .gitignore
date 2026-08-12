@@ -8,6 +8,13 @@ data/raw/population_roads/*
 
 data/processed/*
 !data/processed/.gitkeep
+# ...except small, citable result files (not the large intermediate pickles/rasters)
+!data/processed/inequality_per_kabupaten.csv
+!data/processed/inequality_sentinel1_per_kabupaten.csv
+!data/processed/inequality_sentinel1_summary.csv
+!data/processed/inequality_summary.csv
+!data/processed/kabupaten_capacity_index.geojson
+!data/processed/kalsel_facilities_snapped.geojson
 
 # Common geospatial/data formats that belong in raw/ but not in git
 *.tif
@@ -22,6 +29,8 @@ data/processed/*
 # ...except small reference boundaries, worth keeping in git unlike bulk downloads
 !data/raw/kalsel_boundary.geojson
 !data/raw/kalsel_kabupaten_boundaries.geojson
+!data/processed/kabupaten_capacity_index.geojson
+!data/processed/kalsel_facilities_snapped.geojson
 
 # Python
 __pycache__/
