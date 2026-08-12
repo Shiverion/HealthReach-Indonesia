@@ -6,10 +6,14 @@ The earlier moderate scenarios used different multipliers for the two layers
 comparison, since outcome = f(footprint, penalty) and both were varying at
 once. This sweeps both layers across the same multiplier set and reports,
 per multiplier: population-weighted access, and the underserved-vs-well-served
-60min accessibility gap before/after -- the actual test is whether the
-*direction and rough magnitude* of "proxy != observed" and "gap widens more
-under observed than proxy" survive across the whole sweep, not whether any
-single multiplier is "the right one".
+60min accessibility gap before/after.
+
+Actual result (see docs/robustness_checks.md §4): both layers show positive
+gap-widening at every multiplier -- flood disruption amplifies the chronic
+gap under both representations, not just the observed one. The finding is
+that the PROXY systematically OVERSTATES this widening relative to observed
+data, by 1.7-2.6x at every multiplier tested, not that only one
+representation shows amplification at all.
 """
 import pickle
 import numpy as np
