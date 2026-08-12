@@ -1,10 +1,10 @@
-# Beyond Proximity: Capacity-Aware Healthcare Accessibility Under Flood Disruption in South Kalimantan, Indonesia
+# Beyond Proximity: Capacity-Stratified Healthcare Accessibility Under Flood Disruption in South Kalimantan, Indonesia
 
-**Status: Draft v0.1.** Independent replication and extension. Repository: [HealthReach-Indonesia](https://github.com/Shiverion/HealthReach-Indonesia).
+**Status: Draft v0.2.** Independent replication and extension. Repository: [HealthReach-Indonesia](https://github.com/Shiverion/HealthReach-Indonesia). Changes from v0.1 are substantive, not editorial — see `docs/robustness_checks.md` for the three issues a review pass caught and how each was resolved (facility-extraction undercount, a disruption-scenario definition bug, and a chokepoint-finding artifact audit). This version's numbers are corrected; v0.1's are not, and are kept in `docs/phase1_summary.md` / `docs/phase2_summary.md` for the audit trail rather than quietly edited away.
 
 ## Abstract
 
-Standard geographic healthcare accessibility models treat facilities as uniform points and disasters as static hazard layers, obscuring two things that determine real-world impact: whether a facility is actually staffed to treat patients, and where a flood actually happened rather than where it merely could. We replicate the geospatial network-accessibility methodology used by Macharia et al. (Kenya, 2025 preprint) for South Kalimantan, Indonesia, and extend it in two directions: (1) district-level healthcare workforce capacity weighting, using a WHO SDG 3.c.1-style clinical staff density indicator, and (2) validation of flood disruption against Sentinel-1 SAR-observed flood extent for the actual January 2021 South Kalimantan flood, rather than a static multi-year hazard-risk classification. We find that baseline accessibility already varies substantially by district workforce capacity (68.6% vs. 88.9% of population within 60 minutes of a facility, low- vs. high-capacity districts), that this gap widens under flood disruption in a way only visible with the *real* disruption footprint (a −6.5pp vs. −1.5pp access change), and — as a general methodological finding independent of this specific case — that a flood's *road-network topology* (which specific crossings it inundates) determines its accessibility impact more than its raw areal extent, because real floods concentrate on structural network chokepoints in a way that diffuse hazard-risk layers do not.
+Standard geographic healthcare accessibility models treat facilities as uniform points and disasters as static hazard layers, obscuring two things that determine real-world impact: whether a district is adequately staffed to treat patients, and where a flood actually happened rather than where it merely could. We replicate the geospatial network-accessibility methodology used by Macharia et al. (Kenya, 2025 preprint) for South Kalimantan, Indonesia, and extend it in two directions: (1) a district-level healthcare workforce capacity index used to stratify accessibility results by district, and (2) validation of flood disruption against Sentinel-1 SAR-observed flood extent for the actual January 2021 South Kalimantan flood, rather than a static multi-year hazard-risk classification. Three findings, in order of how much confidence each supports: **chronic inequality** — baseline accessibility already varies by district workforce capacity (72.8% vs. 90.0% of population within 60 minutes of a facility, low- vs. high-capacity districts); **disaster amplification** — this gap widens under real flood disruption (a −2.8pp vs. −0.4pp change), visible only with observed disruption data, not a hazard-risk proxy; and, with appropriately limited confidence given a single event, **evidence consistent with** a network-topology mechanism in which which specific roads flood matters more to accessibility than how much area floods.
 
 ## 1. Introduction
 
@@ -12,13 +12,13 @@ Geographic accessibility to healthcare is typically modeled as a function of pop
 
 This study asks: for a specific flood event in a specific place, how much does each simplification matter, and does correcting for them change which populations are identified as most affected?
 
-South Kalimantan, Indonesia is a strong setting for this question. It experienced a well-documented, severe flood in January 2021 (BNPB: 10 of 13 kabupaten/kota affected, 46 deaths, 633,273 people affected) with real ground-truth impact data to validate against, sits on a river delta where population and infrastructure concentrate on flood-prone lowlands, and has open data across the layers this analysis needs (OpenStreetMap facilities and roads, WorldPop population, government workforce statistics, and free Sentinel-1 SAR archives).
+South Kalimantan, Indonesia is a strong setting for this question. It experienced a well-documented, severe flood in January 2021 (BNPB: 10 of 13 kabupaten/kota affected, 46 deaths, 633,273 people affected) with real ground-truth impact data to validate against, sits on a river delta where population and infrastructure concentrate on flood-prone lowlands, and has open data across the layers this analysis needs.
 
 ## 2. Related work and positioning
 
-**Primary reproduction target:** Macharia et al., *"Impact analysis of flood-induced changes in geographical accessibility and coverage to healthcare in both public and private sector, Kenya"* (Research Square preprint, 2025) — establishes the baseline-vs-disrupted geographic accessibility methodology this study reproduces, itself building on Macharia et al.'s earlier Kenya facility-accessibility work (Macharia et al. 2023, *Geographic accessibility to public and private health facilities in Kenya in 2021*).
+**Primary reproduction target:** Macharia et al., *"Impact analysis of flood-induced changes in geographical accessibility and coverage to healthcare in both public and private sector, Kenya"* (Research Square preprint, 2025) — establishes the baseline-vs-disrupted geographic accessibility methodology this study reproduces.
 
-**Prior art in Indonesia, explicitly acknowledged rather than presented as absent:** HeiGIT's *Flood Impact Assessment on Road Network and Healthcare Access... Jakarta, Indonesia* (AGILE-GISS, 2021) applies the same genre of flood-accessibility analysis to the 2013 Jakarta flood. Several static (non-flood) Indonesian accessibility studies exist for other regions (Maluku, Muna Barat, Gunungkidul). This study's contribution is not "the first accessibility study in Indonesia" but the combination of (a) a new region and event, (b) workforce capacity weighting, and (c) validated observed-extent disruption modeling with an explicit comparison against the more commonly-used hazard-proxy approach.
+**Prior art in Indonesia, explicitly acknowledged:** HeiGIT's *Flood Impact Assessment on Road Network and Healthcare Access... Jakarta, Indonesia* (AGILE-GISS, 2021) applies the same genre of analysis to the 2013 Jakarta flood. This study's contribution is not "the first accessibility study in Indonesia" but the combination of a new region and event, capacity stratification, and validated observed-extent disruption modeling with an explicit comparison against the more commonly-used hazard-proxy approach.
 
 ## 3. Data and methods
 
@@ -26,91 +26,109 @@ South Kalimantan, Indonesia is a strong setting for this question. It experience
 
 South Kalimantan province, 13 kabupaten/kota. Disruption event: the January 2021 flood, BNPB-documented across 10 of the 13 districts.
 
-### 3.2 Data sources
+### 3.2 Data sources and their temporal alignment
 
-| Layer | Source | Notes |
+| Layer | Source | Reference date |
 |---|---|---|
-| Health facilities | OpenStreetMap (Geofabrik Kalimantan extract, streamed via `pyosmium`) | 90 facilities (35 hospitals, 46 clinics, 9 doctors) |
-| Road network | Same OSM extract, classified roads (motorway–residential) | 62,674 segments, 592k-node graph |
-| Population | WorldPop Indonesia 2020, 100m | ~4.50M in the clipped province area |
-| Baseline flood hazard (proxy) | BNPB InaRISK, rendered raster reclassified into 3 risk bins | Multi-year hazard-risk zone, not event-specific |
-| Observed flood extent (primary) | Sentinel-1 GRD, before/after pair (Dec 15 2020 / Jan 20 2021) | See §3.5 |
-| District workforce | Dinkes Kalsel *Profil Kesehatan 2022*, Tabel 13–14 | Doctors, nurses, midwives by kabupaten |
+| Health facilities | OpenStreetMap (Geofabrik Kalimantan extract) | current snapshot (2026) |
+| Road network | Same OSM extract | current snapshot (2026) |
+| Population | WorldPop Indonesia | 2020 |
+| Flood event | Sentinel-1 SAR, BNPB reports | January 2021 |
+| District workforce | Dinkes Kalsel *Profil Kesehatan* | 2022 |
 
-### 3.3 Baseline accessibility model
+**This table makes a real limitation visible rather than hiding it: the road/facility network is a current (2026) OSM snapshot, not a January-2021 snapshot.** WorldPop 2020 against a January 2021 flood is a reasonable one-year gap. Workforce data from 2022 against a 2021 event is a defensible one-year gap given no earlier published alternative exists. The road/facility gap is larger and unaddressed here — see §5.2. The concrete remedy, not implemented in this pass, is an Overpass historical query pinned to `[date:"2021-01-20T00:00:00Z"]` in place of the current-snapshot extract, ideally as a sensitivity check against the current results rather than a full replacement.
 
-Standard population → road network → facility travel-time model. Roads assigned free-flow speeds by class (20–80 km/h). Travel time from every road-network node to the nearest facility computed via a single multi-source Dijkstra run (all 89 graph-matched facility nodes as simultaneous sources) rather than one shortest-path query per population point — the same result, computed once instead of tens of thousands of times. Population aggregated to ~1km cells (sum-resampled, preserving total counts) and snapped to the nearest graph node via a KD-tree for the population-weighted summary.
+### 3.3 Health facility extraction
 
-### 3.4 District capacity index
+365 facilities (75 hospitals, 263 clinics, 21 doctors, 3 dentists, 3 unnamed) via `osmium`'s two-pass multipolygon/relation area assembly (`src/12_extract_facilities_complete.py`), filtered to care-providing categories matching the official Kemenkes/BNPB scope (excludes standalone pharmacies), deduplicated by proximity + name matching. This corrects an earlier extraction (90 facilities) that only captured point-mapped OSM features and silently missed building/relation-mapped hospital campuses — see `docs/robustness_checks.md` §1 for the diagnosis and fix, and note the baseline median travel time changed from 13.7 to 6.8 minutes as a result. Every number in this manuscript uses the corrected 365-facility dataset.
 
-Following the WHO SDG 3.c.1 convention (physicians + nursing/midwifery personnel per 10,000 population), a clinical-staff density index was computed per kabupaten from doctors (general + specialist), nurses, and midwives, divided by WorldPop population zonal-summed to the same kabupaten boundaries. Districts were split at the province median into "underserved" and "well-served" classes.
+### 3.4 Baseline accessibility model
 
-### 3.5 Flood disruption modeling: proxy vs. observed
+Standard population → road network → facility travel-time model. Roads assigned free-flow speeds by class (20–80 km/h). Travel time from every road-network node to the nearest facility computed via a single multi-source Dijkstra run (all facility-matched graph nodes as simultaneous sources). Population aggregated to ~1km cells (sum-resampled) and snapped to the nearest graph node via KD-tree for the population-weighted summary.
 
-Two disruption layers were used, deliberately, to make the comparison itself part of the result rather than to discard one in favor of the other.
+### 3.5 District capacity index
 
-**Proxy (BNPB InaRISK hazard classification).** BNPB's flood-hazard MapServer exposes only a rendered RGBA raster (no raw classification value endpoint was found), so hazard class was reverse-engineered via color-threshold classification into three bins (low/medium/high). This represents flood-*prone* area accumulated over many years, not any single event's footprint.
+Following the WHO SDG 3.c.1 convention (physicians + nursing/midwifery personnel per 10,000 population), a clinical-staff density index was computed per kabupaten from doctors, nurses, and midwives (Tabel 13–14 of the Profil Kesehatan document), divided by WorldPop population zonal-summed to kabupaten boundaries. Districts were split at the province median into "underserved" and "well-served" classes.
 
-**Observed (Sentinel-1 SAR).** A Sentinel-1 GRD pair was obtained: baseline Dec 15, 2020 and event Jan 20, 2021, matched to the same relative orbit for consistent viewing geometry. Raw GRD products carry only ground-control-point geolocation (no direct affine transform), so each scene was warped to EPSG:4326 via its embedded GCPs and cropped to the flood-affected AOI. Water was classified independently per scene via Otsu thresholding on log-scaled VV backscatter intensity (a per-image relative separation — adequate for isolating a scene's low-backscatter mode without requiring full radiometric sigma0 calibration). New flood extent was defined as event-classified water not present in the baseline classification, removing permanent rivers and water bodies common to both dates. The result was visually validated against known geography: flooding concentrates tightly along the Barito river corridor and the low-lying delta near the provincial capital, while the mountainous Meratus range at the AOI's eastern edge shows negligible flooded area — the expected physical pattern.
+**A framing clarification, stated explicitly rather than left implicit:** this index is used to *stratify* the accessibility results — computing them separately for low- and high-capacity districts and comparing — not to *integrate* capacity into the accessibility function itself. A 500-staff hospital and a 3-staff clinic are still treated identically as "the nearest facility" in the travel-time model; capacity does not change which facility is selected as nearest or how far away it counts as accessible. This is a capacity-*stratified* accessibility analysis, not a capacity-*weighted* one in the sense of a joint model like 2SFCA or a gravity-based supply-demand formulation, which would require facility-level (not district-level) workforce data this project does not have. We did not fabricate a facility-level proxy to make the model appear more sophisticated than the data supports; the title and framing throughout reflect stratification, and a genuine capacity-integrated model (e.g., Enhanced 2SFCA) is noted as future work in §5.2, contingent on facility-level data becoming available.
 
-For both disruption layers, two brackets were computed against the road graph: **severe** (affected road segments removed as impassable) and **moderate** (affected segments penalized, travel time × 2.5 for the proxy / × 5 for the observed extent, representing passable-but-slow-or-risky conditions rather than complete impassability). The severe bracket is a network-fragility stress test; the moderate bracket is the more realistic estimate of actual conditions, since flooded roads are rarely completely and uniformly impassable to all traffic (informal detours, 4WD, boat) — a binary graph-edge deletion cannot represent that resilience mechanism.
+### 3.6 Flood disruption modeling: proxy vs. observed
+
+Two disruption layers were used deliberately, so the comparison itself is part of the result.
+
+**Proxy (BNPB InaRISK hazard classification).** BNPB's flood-hazard MapServer exposes only a rendered RGBA raster, reverse-engineered via color-threshold classification into three bins (low/medium/high). Represents flood-*prone* area accumulated over many years, not any single event's footprint.
+
+**Observed (Sentinel-1 SAR).** A Sentinel-1 GRD pair (baseline Dec 15, 2020; event Jan 20, 2021; matched relative orbit) was warped to EPSG:4326 via embedded GCPs, cropped to the AOI, and water classified per-scene via Otsu thresholding on log-scaled VV backscatter. New flood extent = event water minus baseline water. Visually validated against known geography (river-corridor concentration, negligible flooding on the mountainous AOI edge).
+
+**Disruption brackets, defined identically in operation for both layers** (a fix from an earlier draft where the proxy-moderate scenario mixed edge removal and penalty inconsistently — see `docs/robustness_checks.md` §2):
+- **Severe:** flagged road segments removed (impassable) — a network-fragility stress test
+- **Moderate:** flagged segments penalized (×2.5 proxy / ×5 observed), nothing removed — the more realistic estimate, verified to leave graph connectivity unchanged from baseline as required by construction
 
 ## 4. Results
 
 ### 4.1 Baseline accessibility
 
-83.6% of South Kalimantan's population has road-network access to a health facility of any kind; 64.8% within 30 minutes, 78.4% within 60 minutes, 83.0% within 120 minutes.
+83.6% of South Kalimantan's population has road-network access to a health facility of any kind; 75.3% within 30 minutes, 81.0% within 60 minutes, 83.4% within 120 minutes.
 
-### 4.2 Flood disruption: proxy vs. observed
+### 4.2 Finding 1 — Chronic inequality (pre-disaster)
+
+| Capacity class | Baseline: within 60min |
+|---|---|
+| Underserved | 72.8% |
+| Well-served | 90.0% |
+
+Districts with below-median clinical-workforce density already show substantially worse baseline accessibility, independent of any flooding. This is the least surprising of the three findings and the one supported with the most confidence — it does not depend on any disruption-modeling choice.
+
+### 4.3 Finding 2 — Disaster amplification, visible only with observed data
 
 | Scenario | Any access | Within 30min | Within 60min | Within 120min |
 |---|---|---|---|---|
-| Baseline | 83.6% | 64.8% | 78.4% | 83.0% |
-| Proxy — moderate | 44.2%¹ | 31.0% | 39.5% | 43.6% |
-| Proxy — severe | 26.0% | 14.8% | 21.6% | 25.1% |
-| Observed (Sentinel-1) — moderate | 83.6% | 57.8% | 74.3% | 81.8% |
-| Observed (Sentinel-1) — severe | 6.0% | 3.3% | 4.5% | 5.7% |
+| Baseline | 83.6% | 75.3% | 81.0% | 83.4% |
+| Sentinel-1 — moderate (primary estimate) | 83.6% | 71.0% | 79.4% | 82.8% |
+| Sentinel-1 — severe (stress test) | 6.0% | 3.9% | 5.2% | 5.8% |
 
-¹ "Any access" for the proxy scenarios reflects total network fragmentation from removing all medium+high hazard-zone edges province-wide; see §5.1 for why this differs so sharply from the observed-extent severe scenario despite affecting a larger share of edges.
-
-**The observed-extent moderate scenario is the primary real-world estimate**, and its magnitude (a 7pp drop in 30-minute access) is far more consistent with BNPB's reported ~15% of population directly affected than either severe scenario or the proxy-based moderate scenario. The proxy systematically overstates disruption because it applies a general multi-year hazard classification uniformly, rather than the geographically specific footprint of one event.
-
-### 4.3 A network-topology finding, not specific to this case
-
-The observed-extent severe scenario disconnects *more* of the population (94%) than the proxy severe scenario (74%) despite affecting *fewer* road segments (9.94% of edges vs. 17.3%). This is not noise: real flood water concentrates on river corridors, and roads cross rivers at a comparatively small number of bridges — exactly the network's structural chokepoints. A hazard-risk proxy, being more diffusely distributed across a broader area, removes more edges overall but hits fewer *critical* ones. The general form of this finding — that which specific links are disrupted matters more to network connectivity than how many or how much area is affected — is a transportation-network-science result independent of this specific flood, and is directly actionable: it argues for prioritizing bridge/chokepoint resilience investment over broad area-based hazard mitigation when the goal is preserving healthcare access specifically.
-
-### 4.4 Inequality by district capacity
-
-| Capacity class | Baseline within 60min | Observed (moderate) within 60min | pp change |
+| Capacity class | Baseline within 60min | Observed-moderate within 60min | pp change |
 |---|---|---|---|
-| Underserved | 68.6% | 62.1% | **−6.5pp** |
-| Well-served | 88.9% | 87.3% | −1.5pp |
+| Underserved | 72.8% | 70.0% | **−2.8pp** |
+| Well-served | 90.0% | 89.5% | −0.4pp |
 
-Underserved districts start from a substantially worse baseline (a standalone chronic-inequality finding, independent of flooding) and lose disproportionately more access under real flood disruption. This pattern is clean at the aggregate level using observed-extent data. It was *not* clean using the hazard-zone proxy — there, Kota Banjarmasin (highest capacity, 56.1 staff/10k, but also the most flood-exposed district geographically, being the low-lying delta capital) collapsed entirely under the proxy's blanket hazard coverage and flipped the population-weighted aggregate, requiring the two cities to be excluded before the expected pattern was visible among the 11 rural kabupaten. With observed extent, Banjarmasin shows a 0.0pp change (its specific road connections were not, in fact, part of the actual flooded footprint), and the aggregate inequality result holds without needing to exclude anything. **This is itself evidence for why observed-extent validation matters methodologically, not only for accuracy but for whether an inequality claim survives scrutiny at all.**
+Underserved districts lose roughly 6.5× the proportional access that well-served districts do under the real flood. This holds cleanly at the aggregate level with observed data. It did **not** hold cleanly with the hazard-zone proxy: there, Kota Banjarmasin — highest workforce capacity in the province (56.1 staff/10k) but also the most flood-exposed district geographically (the low-lying delta capital) — collapsed entirely under the proxy's blanket hazard coverage and flipped the population-weighted aggregate. With observed extent, Banjarmasin shows a **0.0pp change** (its specific connecting roads were not, in fact, part of the actual flooded footprint), and the inequality result holds without excluding anything. This is itself evidence that observed-extent validation matters for whether an inequality claim survives scrutiny, not only for precision.
 
-The single sharpest data point: Barito Kuala, the lowest-capacity district in the province (24.6 clinical staff per 10k population), shows the largest access drop of any district (−25.2pp), and sits immediately adjacent to Banjarmasin on the same low-lying delta.
+**Note on the severe bracket specifically:** at full edge removal, the aggregate reverses (well-served districts show a larger pp drop, 83.3 vs. 69.1) because several well-served districts collapse to near-zero access under that unrealistic setting. Read this as further reason the severe bracket is a stress test, not a headline number — the moderate bracket is where the inequality finding should be read.
+
+**Sharpest single data point:** Barito Kuala, the lowest-capacity district in the province, shows the largest access drop of any district (−10.2pp, 88.7%→78.5%), followed by Banjar (−4.1pp) — both underserved, both adjacent to the low-lying delta.
+
+### 4.4 Finding 3 — Evidence consistent with a network-topology mechanism (n=1, stated at appropriate confidence)
+
+The observed-extent severe scenario disconnects more of the population (94.0%) than the proxy-based severe scenario (74.0%) despite affecting fewer roads (9.94% of edges vs. 17.3%). Real flood water concentrates on river corridors; roads cross rivers at a comparatively small number of structural chokepoints. A hazard-risk proxy, more diffusely distributed, removes more edges overall but hits fewer *critical* ones.
+
+**Audited against an alternative explanation:** this pattern could in principle be a SAR/vector-overlay artifact — a bridge deck detected as "flooded" because SAR sees water underneath it while the deck itself stays dry and passable. Of the 734 significant-road-class edges that are both flooded and graph-theoretic chokepoints (edges whose removal alone disconnects part of the network), only 9.8% (12 of 122 matched source ways) are OSM-tagged as bridges — reassuring against the artifact explanation, though incomplete OSM bridge-tagging in this region means under-tagged real bridges cannot be fully ruled out without imagery-based verification, which was not performed. Full audit: `docs/robustness_checks.md` §3.
+
+**Confidence level, stated explicitly:** this is one flood event in one province. The result is evidence consistent with a general network-topology mechanism — that accessibility disruption is determined more by the structural importance of affected links than by the total number or area of affected roads — not a demonstrated general empirical finding. Establishing generality would require replication across additional flood events and network topologies, which this study does not attempt.
 
 ## 5. Discussion
 
 ### 5.1 Robustness: what changed between proxy and observed data, and why it matters
 
-Both disruption layers agree on direction (flooding reduces access, more so for underserved districts) but disagree substantially on magnitude and, critically, on which specific districts appear most affected. The proxy's Banjarmasin confound (§4.4) demonstrates that a hazard-risk layer is not a safe substitute for observed extent even for *directional* claims about inequality, not merely for precise magnitudes. Any accessibility study using only a hazard-risk proxy (a common practice, since observed-extent processing is more difficult) should treat district-level disparities identified that way as provisional rather than confirmed.
+Both disruption layers agree on direction but disagree on magnitude and, critically, on which specific districts appear most affected. The proxy's Banjarmasin confound (§4.3) demonstrates that a hazard-risk layer is not a safe substitute for observed extent even for *directional* inequality claims, not merely for precise magnitudes. This comparison — not the capacity stratification — is this project's most defensible methodological contribution; see §5.3.
 
 ### 5.2 Limitations
 
-- **Facility completeness.** 90 facilities is likely an undercount: the extraction reliably captured point-mapped OSM facilities but not building-outline/multipolygon-relation-mapped hospital campuses. An independent Overpass count found 76 hospital-tagged and 275 clinic/health-centre-tagged features province-wide (nodes+ways combined) versus 90 in the final dataset.
-- **District-, not facility-level, capacity.** Facility-level workforce data is not public in South Kalimantan; the capacity index is necessarily a district average, which cannot distinguish a well-staffed hospital from an understaffed one within the same kabupaten.
-- **Binary/penalty disruption modeling.** Neither the "removed" nor "penalized ×5" treatment of flooded road segments captures real-world adaptive behavior — informal water transport, wading, temporary detours — that likely means the true population-affected figure sits between the moderate and severe brackets, closer to moderate. The severe bracket should be read as a network-fragility stress test, not a literal claim.
-- **Single before/after SAR pair.** One baseline and one event scene, not a dense time series; flood extent may have been larger or smaller at other points in the multi-week event.
-- **Preprint status.** The primary reproduction target (Macharia et al.) was a preprint as of this analysis; its peer-reviewed status should be re-checked before final citation.
+- **Facility completeness, partially addressed.** The original 90-facility extraction undercounted by roughly 4x (fixed, see §3.3), but the corrected 365 may still not be complete or fully deduplicated; no independent ground-truth facility census was used to validate the final count beyond cross-checking province-wide OSM tag totals.
+- **District-, not facility-level, capacity.** Facility-level workforce data is not public in South Kalimantan; the capacity index is a district average and cannot distinguish a well-staffed hospital from an understaffed one within the same kabupaten. The methodology is capacity-*stratified*, not capacity-*integrated* — see §3.5.
+- **Temporal mismatch across data layers.** Road/facility network reflects a current (2026) OSM snapshot applied to a January 2021 event; not addressed with a historical-snapshot sensitivity check in this pass (concrete remedy noted in §3.2).
+- **SAR processing rigor.** Water classification uses per-image Otsu thresholding on raw (uncalibrated) VV backscatter intensity — adequate for isolating a bimodal low/high-backscatter split within one image, but does not include radiometric calibration to sigma0, speckle filtering, terrain correction, a permanent-water mask from an external product, connected-component filtering to remove speckle-scale false positives, VV+VH combination, or validation against an independent observed-flood product. Appropriate for exploratory event mapping; a remote-sensing reviewer would reasonably ask for these before treating the flood extent as publication-grade. Single before/after pair, not a dense time series — flood extent may have differed at other points in the multi-week event.
+- **Binary/penalty disruption modeling.** Neither "removed" nor "penalized" fully captures real-world adaptive behavior (informal water transport, wading, temporary detours). The true population-affected figure likely sits closer to the moderate bracket than the severe one, but this is a qualitative judgment, not something the current model quantifies directly.
+- **Bridge-artifact audit is reassuring, not conclusive.** See §4.4 — OSM bridge-tagging completeness in this region is an open uncertainty.
+- **Preprint status.** The primary reproduction target (Macharia et al.) was a preprint as of this analysis; peer-reviewed status should be re-checked before final citation.
 
 ### 5.3 Contribution
 
-Relative to the reproduced methodology: (1) district-level capacity weighting using a standard, comparable WHO indicator rather than proximity alone; (2) a validated comparison between hazard-proxy and observed-extent disruption modeling for the same event, showing the proxy approach is not just less precise but can produce a materially different (and in this case confounded) inequality finding; (3) a network-topology finding — chokepoint concentration mattering more than areal extent — that is transportable to other flood-accessibility contexts beyond this specific case.
+Relative to the reproduced methodology: (1) a district-level capacity-stratified view of accessibility, explicitly scoped as stratification rather than a claim of capacity-integrated modeling; (2) a validated comparison between hazard-proxy and observed-extent disruption modeling for the same event, showing the proxy approach can produce a materially different and confounded inequality finding, which is this project's cleanest and most defensible result; (3) evidence, appropriately hedged for a single case, consistent with a network-topology mechanism where chokepoint concentration matters more than areal extent, audited against a specific plausible artifact explanation rather than asserted at face value.
 
 ## 6. Data and code availability
 
-All data pipeline code, intermediate outputs, and this manuscript are at [github.com/Shiverion/HealthReach-Indonesia](https://github.com/Shiverion/HealthReach-Indonesia). Raw bulk downloads (population raster, road/facility PBF extracts, Sentinel-1 scenes) are not committed to the repository (see `.gitignore`) but are reproducible from the scripts in `src/`, which document the exact source URLs and access methods used, including several dead ends (live Overpass API instability, GDAL OSM-driver parsing bugs, a corrupted PDF text layer, two rounds of mislocated Sentinel-1 scene selection) left in place as methodological notes rather than cleaned away.
+All data pipeline code, intermediate outputs, and this manuscript are at [github.com/Shiverion/HealthReach-Indonesia](https://github.com/Shiverion/HealthReach-Indonesia). Raw bulk downloads are not committed (see `.gitignore`) but reproducible from `src/`, which documents exact source URLs and access methods, including dead ends left in place as methodological notes: live Overpass API instability, GDAL OSM-driver parsing bugs, a corrupted PDF text layer, two rounds of mislocated Sentinel-1 scene selection, an under-scoped facility extraction, and an inconsistently-defined disruption scenario — see `docs/robustness_checks.md` for the last two.
 
 ## References
 

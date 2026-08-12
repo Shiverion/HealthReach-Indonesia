@@ -1,12 +1,12 @@
-"""Flood-disrupted travel-time scenario using the REAL observed Sentinel-1 flood
+"""Flood-disrupted travel-time scenarios using the REAL observed Sentinel-1 flood
 extent for the Jan 2021 event (src/10_sentinel1_flood_extent.py), replacing the
 interim BNPB hazard-zone proxy used in src/06_flood_disruption.py.
 
-Unlike the hazard-zone proxy (a broad multi-year risk classification, which is why
-that scenario needed severe/moderate brackets to avoid overclaiming), this is the
-actual observed flood footprint for this specific event -- so a single binary
-"road segment underwater = impassable" scenario is now a defensible primary result,
-not just a sensitivity bound.
+Same severe/moderate bracket structure as the proxy scenarios in
+src/06_flood_disruption.py, and defined identically in *operation* (severe =
+remove, moderate = penalize only, nothing removed) so the two are genuinely
+comparable -- see docs/manuscript.md §5.1 for why that comparison is treated
+as a primary result, not just a discarded first attempt at the proxy.
 """
 import pickle
 import statistics
@@ -23,8 +23,8 @@ DATA_PROC = Path(__file__).resolve().parent.parent / "data" / "processed"
 GRAPH = DATA_PROC / "kalsel_road_graph.pickle"
 FLOOD_EXTENT = DATA_RAW / "flood" / "sentinel1_observed_flood_extent.tif"
 FACILITIES = DATA_PROC / "kalsel_facilities_snapped.geojson"
-OUT_TIME = DATA_PROC / "flood_disrupted_sentinel1_travel_time.pickle"
-OUT_EDGES = DATA_PROC / "flood_affected_edges_sentinel1.geojson"
+
+MODERATE_PENALTY = 5.0
 
 
 def sample_flood_at_midpoints(G, flood_path):
@@ -45,6 +45,44 @@ def sample_flood_at_midpoints(G, flood_path):
     return edges, flooded, in_bounds
 
 
+def run_scenario(G, facilities, edges, flooded_mask, mode, out_time, out_edges=None):
+    G_scenario = G.copy()
+    affected_rows = []
+    for (u, v, data), is_flooded in zip(edges, flooded_mask):
+        if not is_flooded:
+            continue
+        affected_rows.append({"highway": data.get("highway"), "geometry": LineString([u, v])})
+        if mode == "severe":
+            G_scenario.remove_edge(u, v)
+        elif mode == "moderate":
+            G_scenario[u][v]["time_min"] *= MODERATE_PENALTY
+        else:
+            raise ValueError(mode)
+
+    if out_edges is not None:
+        gpd.GeoDataFrame(affected_rows, crs="EPSG:4326").to_file(out_edges, driver="GeoJSON")
+        print(f"  [ok] flood-affected edges -> {out_edges}")
+
+    components = sorted(nx.connected_components(G_scenario), key=len, reverse=True)
+    G_main = G_scenario.subgraph(components[0]).copy()
+    print(f"  [info] largest component: {len(components[0])} nodes "
+          f"({100*len(components[0])/G.number_of_nodes():.1f}% of original graph)")
+
+    sources = set(zip(facilities["snap_lon"], facilities["snap_lat"]))
+    sources = {s for s in sources if s in G_main}
+    print(f"  [info] {len(sources)} facility source nodes reachable")
+
+    travel_time = nx.multi_source_dijkstra_path_length(G_main, sources, weight="time_min")
+    times = sorted(travel_time.values())
+    print(f"  [info] travel time (min) — median={statistics.median(times):.1f}, "
+          f"p90={times[int(0.9*len(times))]:.1f}, max={max(times):.1f}")
+    print(f"  [info] nodes stranded from all facilities: {G.number_of_nodes() - len(travel_time)}")
+
+    with open(out_time, "wb") as f:
+        pickle.dump(travel_time, f)
+    print(f"  [ok] travel time -> {out_time}")
+
+
 def main():
     with open(GRAPH, "rb") as f:
         G = pickle.load(f)
@@ -53,37 +91,16 @@ def main():
     edges, flooded, in_bounds = sample_flood_at_midpoints(G, FLOOD_EXTENT)
     print(f"[info] {in_bounds.sum()}/{len(edges)} edges fall within the Sentinel-1 scene footprint")
     print(f"[info] {flooded.sum()}/{len(edges)} edges ({100*flooded.sum()/len(edges):.2f}% of all edges) "
-          f"cross observed flood water")
+          f"cross observed flood water\n")
 
-    G_disrupted = G.copy()
-    affected_rows = []
-    for (u, v, data), is_flooded in zip(edges, flooded):
-        if is_flooded:
-            G_disrupted.remove_edge(u, v)
-            affected_rows.append({"highway": data.get("highway"), "geometry": LineString([u, v])})
+    print("=== SEVERE (remove) ===")
+    run_scenario(G, facilities, edges, flooded, "severe",
+                 DATA_PROC / "flood_disrupted_sentinel1_travel_time.pickle",
+                 DATA_PROC / "flood_affected_edges_sentinel1.geojson")
 
-    affected_gdf = gpd.GeoDataFrame(affected_rows, crs="EPSG:4326")
-    affected_gdf.to_file(OUT_EDGES, driver="GeoJSON")
-    print(f"[ok] flood-affected edges -> {OUT_EDGES}")
-
-    components = sorted(nx.connected_components(G_disrupted), key=len, reverse=True)
-    G_main = G_disrupted.subgraph(components[0]).copy()
-    print(f"[info] post-disruption largest component: {len(components[0])} nodes "
-          f"({100*len(components[0])/G.number_of_nodes():.1f}% of original graph)")
-
-    sources = set(zip(facilities["snap_lon"], facilities["snap_lat"]))
-    sources = {s for s in sources if s in G_main}
-    print(f"[info] {len(sources)} facility source nodes reachable post-disruption")
-
-    travel_time = nx.multi_source_dijkstra_path_length(G_main, sources, weight="time_min")
-    times = sorted(travel_time.values())
-    print(f"[info] disrupted travel time (min) — median={statistics.median(times):.1f}, "
-          f"p90={times[int(0.9*len(times))]:.1f}, max={max(times):.1f}")
-    print(f"[info] nodes stranded from all facilities: {G.number_of_nodes() - len(travel_time)}")
-
-    with open(OUT_TIME, "wb") as f:
-        pickle.dump(travel_time, f)
-    print(f"[ok] Sentinel-1-based flood-disrupted travel time -> {OUT_TIME}")
+    print("\n=== MODERATE (penalize 5x, no removal) ===")
+    run_scenario(G, facilities, edges, flooded, "moderate",
+                 DATA_PROC / "flood_disrupted_sentinel1_moderate_travel_time.pickle")
 
 
 if __name__ == "__main__":

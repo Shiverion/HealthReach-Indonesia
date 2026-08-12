@@ -60,11 +60,11 @@ nb1 = make_nb([
         "plt.tight_layout()\n"
         "plt.show()"
     ),
-    md("## Health facilities\n\n90 facilities extracted from OpenStreetMap "
+    md("## Health facilities\n\n365 facilities extracted from OpenStreetMap "
        "(see `../PROTOCOL.md` §6 for why the extraction method changed from live "
        "Overpass queries to streaming `pyosmium` parsing of the Geofabrik PBF)."),
     code(
-        "facilities = gpd.read_file(DATA_RAW / 'facilities' / 'kalsel_facilities.geojson')\n"
+        "facilities = gpd.read_file(DATA_RAW / 'facilities' / 'kalsel_facilities_complete.geojson')\n"
         "print(facilities['amenity'].value_counts())\n\n"
         "fig, ax = plt.subplots(figsize=(9, 9))\n"
         "province.boundary.plot(ax=ax, color='lightgray', linewidth=1)\n"
@@ -301,14 +301,14 @@ nb4 = make_nb([
     ),
     md("## Inequality: access change by capacity, real (Sentinel-1) disruption"),
     code(
-        "per_kab = pd.read_csv(DATA_PROC / 'inequality_sentinel1_per_kabupaten.csv')\n"
-        "per_kab = per_kab.sort_values('capacity_per_10k')\n"
+        "per_kab = pd.read_csv(DATA_PROC / 'inequality_per_kabupaten.csv')\n"
+        "per_kab = per_kab.sort_values('clinical_staff_per_10k')\n"
         "per_kab"
     ),
     code(
         "fig, ax = plt.subplots(figsize=(9, 5))\n"
-        "colors = ['crimson' if d > 10 else 'steelblue' for d in per_kab['pp_drop_moderate']]\n"
-        "ax.barh(per_kab['kabupaten'], per_kab['pp_drop_moderate'], color=colors)\n"
+        "colors = ['crimson' if d > 10 else 'steelblue' for d in per_kab['pp_drop_s1_moderate']]\n"
+        "ax.barh(per_kab['kabupaten'], per_kab['pp_drop_s1_moderate'], color=colors)\n"
         "ax.set_xlabel('Percentage-point drop in 60-min access (baseline → flood, moderate)')\n"
         "ax.set_title('Access Loss by District, Sorted by Workforce Capacity\\n(bottom = lowest capacity)')\n"
         "plt.tight_layout()\n"
@@ -317,12 +317,12 @@ nb4 = make_nb([
     md("## Capacity vs. access loss — correlation check"),
     code(
         "fig, ax = plt.subplots(figsize=(7, 6))\n"
-        "ax.scatter(per_kab['capacity_per_10k'], per_kab['pp_drop_moderate'], s=80, color='steelblue')\n"
+        "ax.scatter(per_kab['clinical_staff_per_10k'], per_kab['pp_drop_s1_moderate'], s=80, color='steelblue')\n"
         "for _, row in per_kab.iterrows():\n"
-        "    ax.annotate(row['kabupaten'], (row['capacity_per_10k'], row['pp_drop_moderate']),\n"
+        "    ax.annotate(row['kabupaten'], (row['clinical_staff_per_10k'], row['pp_drop_s1_moderate']),\n"
         "                fontsize=8, xytext=(5, 5), textcoords='offset points')\n"
-        "z = np.polyfit(per_kab['capacity_per_10k'], per_kab['pp_drop_moderate'], 1)\n"
-        "xs = np.linspace(per_kab['capacity_per_10k'].min(), per_kab['capacity_per_10k'].max(), 50)\n"
+        "z = np.polyfit(per_kab['clinical_staff_per_10k'], per_kab['pp_drop_s1_moderate'], 1)\n"
+        "xs = np.linspace(per_kab['clinical_staff_per_10k'].min(), per_kab['clinical_staff_per_10k'].max(), 50)\n"
         "ax.plot(xs, np.poly1d(z)(xs), '--', color='gray', label=f'trend (slope={z[0]:.2f})')\n"
         "ax.set_xlabel('Clinical staff per 10,000 population')\n"
         "ax.set_ylabel('pp drop in 60-min access under flooding')\n"

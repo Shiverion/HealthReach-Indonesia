@@ -60,10 +60,15 @@ def main():
     pts["snap_node_idx"] = idx
     pts["snap_ok"] = dist <= MAX_SNAP_DIST_DEG
 
+    # S1 (Sentinel-1 observed extent) is the primary/validated comparison -- see
+    # docs/sentinel1_validated_results.md. Proxy scenarios kept alongside for the
+    # proxy-vs-observed methodological comparison (docs/manuscript.md §5.1).
     scenarios = {
         "baseline": DATA_PROC / "baseline_travel_time.pickle",
-        "flood_moderate": DATA_PROC / "flood_disrupted_moderate_travel_time.pickle",
-        "flood_severe": DATA_PROC / "flood_disrupted_travel_time.pickle",
+        "s1_moderate": DATA_PROC / "flood_disrupted_sentinel1_moderate_travel_time.pickle",
+        "s1_severe": DATA_PROC / "flood_disrupted_sentinel1_travel_time.pickle",
+        "proxy_moderate": DATA_PROC / "flood_disrupted_moderate_travel_time.pickle",
+        "proxy_severe": DATA_PROC / "flood_disrupted_travel_time.pickle",
     }
     for key, path in scenarios.items():
         with open(path, "rb") as f:
@@ -91,10 +96,11 @@ def main():
     summary = pd.DataFrame(rows)
     print(summary.to_string(index=False))
 
-    print("\n=== Percentage-point drop in 'within 60 min' access, baseline -> flood (moderate) ===\n")
-    summary["pp_drop_within60_moderate"] = summary["baseline_pct_within60"] - summary["flood_moderate_pct_within60"]
-    summary["pp_drop_within60_severe"] = summary["baseline_pct_within60"] - summary["flood_severe_pct_within60"]
-    print(summary[["capacity_class", "pp_drop_within60_moderate", "pp_drop_within60_severe"]].to_string(index=False))
+    print("\n=== Percentage-point drop in 'within 60 min' access, baseline -> flood ===\n")
+    for scen in ["s1_moderate", "s1_severe", "proxy_moderate", "proxy_severe"]:
+        summary[f"pp_drop_{scen}"] = summary["baseline_pct_within60"] - summary[f"{scen}_pct_within60"]
+    print(summary[["capacity_class"] + [f"pp_drop_{s}" for s in ["s1_moderate", "s1_severe", "proxy_moderate", "proxy_severe"]]]
+          .to_string(index=False))
 
     out = DATA_PROC / "inequality_summary.csv"
     summary.to_csv(out, index=False)
@@ -112,7 +118,8 @@ def main():
             row[f"{key}_pct_within60"] = 100 * within60 / total_pop
         per_kab_rows.append(row)
     per_kab = pd.DataFrame(per_kab_rows).sort_values("clinical_staff_per_10k")
-    per_kab["pp_drop_moderate"] = per_kab["baseline_pct_within60"] - per_kab["flood_moderate_pct_within60"]
+    per_kab["pp_drop_s1_moderate"] = per_kab["baseline_pct_within60"] - per_kab["s1_moderate_pct_within60"]
+    per_kab["pp_drop_proxy_moderate"] = per_kab["baseline_pct_within60"] - per_kab["proxy_moderate_pct_within60"]
     print("\n=== Per-kabupaten detail ===\n")
     print(per_kab.to_string(index=False))
     per_kab.to_csv(DATA_PROC / "inequality_per_kabupaten.csv", index=False)

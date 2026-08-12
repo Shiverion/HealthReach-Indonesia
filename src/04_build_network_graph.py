@@ -14,7 +14,11 @@ DATA_RAW = Path(__file__).resolve().parent.parent / "data" / "raw"
 DATA_PROC = Path(__file__).resolve().parent.parent / "data" / "processed"
 
 ROADS = DATA_RAW / "population_roads" / "kalsel_roads.geojson"
-FACILITIES = DATA_RAW / "facilities" / "kalsel_facilities.geojson"
+# complete extraction (nodes+ways+relations, see src/12_extract_facilities_complete.py)
+# -- supersedes the earlier node-only kalsel_facilities.geojson (90 facilities,
+# missing building/relation-mapped hospital campuses; kept as
+# kalsel_facilities_nodes_only.geojson for the audit trail)
+FACILITIES = DATA_RAW / "facilities" / "kalsel_facilities_complete.geojson"
 
 # rough free-flow speed assumptions by road class (km/h) — standard AccessMod-style
 # defaults for Indonesia-like road conditions; refine later if better local data surfaces

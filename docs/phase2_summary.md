@@ -1,3 +1,5 @@
+> **Superseded.** This document used the original 90-facility dataset (later found to undercount facilities by ~4x, see `docs/robustness_checks.md`). The capacity index itself (workforce-per-population) is unaffected, but the accessibility/inequality numbers are not current. Current numbers: `docs/sentinel1_validated_results.md`.
+
 # Phase 2 Results — District Capacity Weighting & Inequality Analysis
 
 **Status:** Complete. **Region:** South Kalimantan, 13 kabupaten/kota.

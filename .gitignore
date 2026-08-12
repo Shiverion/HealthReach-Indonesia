@@ -10,8 +10,6 @@ data/processed/*
 !data/processed/.gitkeep
 # ...except small, citable result files (not the large intermediate pickles/rasters)
 !data/processed/inequality_per_kabupaten.csv
-!data/processed/inequality_sentinel1_per_kabupaten.csv
-!data/processed/inequality_sentinel1_summary.csv
 !data/processed/inequality_summary.csv
 !data/processed/kabupaten_capacity_index.geojson
 !data/processed/kalsel_facilities_snapped.geojson
@@ -31,6 +29,8 @@ data/processed/*
 !data/raw/kalsel_kabupaten_boundaries.geojson
 !data/processed/kabupaten_capacity_index.geojson
 !data/processed/kalsel_facilities_snapped.geojson
+!data/raw/facilities/kalsel_facilities_complete.geojson
+!data/raw/facilities/kalsel_facilities_nodes_only.geojson
 
 # Python
 __pycache__/

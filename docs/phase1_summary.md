@@ -1,3 +1,5 @@
+> **Superseded.** This document used the original 90-facility dataset (later found to undercount facilities by ~4x, see `docs/robustness_checks.md`) and an inconsistently-defined "moderate" disruption scenario (fixed in the same doc). Kept in place for the audit trail. Current numbers: `docs/sentinel1_validated_results.md`.
+
 # Phase 1 Results — Baseline & Flood-Disrupted Accessibility
 
 **Status:** Complete except issue #5 (Sentinel-1 observed flood extent, blocked on manual NASA Earthdata auth).

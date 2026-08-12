@@ -86,8 +86,10 @@ def main():
 
     scenarios = {
         "BASELINE (normal conditions)": DATA_PROC / "baseline_travel_time.pickle",
-        "FLOOD-DISRUPTED — severe (all medium+high hazard edges removed)": DATA_PROC / "flood_disrupted_travel_time.pickle",
-        "FLOOD-DISRUPTED — moderate (high removed, medium penalized 2.5x)": DATA_PROC / "flood_disrupted_moderate_travel_time.pickle",
+        "PROXY (BNPB hazard-zone) — severe (removed)": DATA_PROC / "flood_disrupted_travel_time.pickle",
+        "PROXY (BNPB hazard-zone) — moderate (penalized 2.5x, nothing removed)": DATA_PROC / "flood_disrupted_moderate_travel_time.pickle",
+        "OBSERVED (Sentinel-1, real Jan 2021 event) — severe (removed)": DATA_PROC / "flood_disrupted_sentinel1_travel_time.pickle",
+        "OBSERVED (Sentinel-1, real Jan 2021 event) — moderate (penalized 5x, nothing removed)": DATA_PROC / "flood_disrupted_sentinel1_moderate_travel_time.pickle",
     }
 
     results = {}
