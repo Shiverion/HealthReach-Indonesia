@@ -19,6 +19,9 @@ data/processed/*
 *.gpkg
 *.geojson
 *.osm.pbf
+# ...except small reference boundaries, worth keeping in git unlike bulk downloads
+!data/raw/kalsel_boundary.geojson
+!data/raw/kalsel_kabupaten_boundaries.geojson
 
 # Python
 __pycache__/
