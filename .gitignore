@@ -17,6 +17,7 @@ data/processed/*
 !data/processed/workforce_denominator_sensitivity.csv
 !data/processed/capacity_vs_access_change_scatter.png
 !data/processed/null_model_random_edges.csv
+!data/processed/null_model_a2_facility_access.csv
 !data/processed/kabupaten_capacity_index.geojson
 !data/processed/kalsel_facilities_snapped.geojson
 
