@@ -6,14 +6,14 @@ Independent replication and extension of disaster-aware geographic healthcare ac
 
 1. [`docs/manuscript.md`](docs/manuscript.md) — the write-up: methods, results, discussion, limitations. Start here.
 2. [`docs/sentinel1_derived_results.md`](docs/sentinel1_derived_results.md) — current numbers in full detail.
-3. [`docs/robustness_checks.md`](docs/robustness_checks.md) — three issues a review pass caught (a 4x facility undercount, a disruption-scenario definition bug, a chokepoint-finding artifact audit) and how each was resolved. Worth reading on its own if you care about how this project handles being wrong.
+3. [`docs/robustness_checks.md`](docs/robustness_checks.md) — issues caught across two rounds of review (a 4x facility undercount, a disruption-scenario bug, and a set of sensitivity checks) and how each was resolved. One of those checks didn't just refine a finding, it disproved it — see §7. Worth reading on its own if you care about how this project handles being wrong.
 4. [`notebooks/`](notebooks) — the same analysis, interactively, with maps and charts.
 
-## Three findings
+## Two findings and one retraction
 
 1. **Chronic inequality.** Districts with below-median healthcare workforce density already have substantially worse baseline accessibility (72.8% vs. 90.0% of population within 60 minutes of a facility), independent of any flooding.
-2. **Disaster amplification.** The real January 2021 flood widened that gap (underserved districts lost roughly 6.5× the proportional access that well-served districts did) — but this is only visible using the actual observed flood extent. A common hazard-risk proxy (BNPB InaRISK) produces a confounded, backwards-looking result for this specific comparison because it doesn't distinguish which of a province's flood-prone areas actually flooded in this event.
-3. **Representation matters, with appropriate confidence.** The real flood disconnected more of the population than the broader hazard-zone proxy despite affecting fewer roads — evidence consistent with a network-topology mechanism (which specific roads fail matters more than how much area floods), audited against a plausible artifact explanation (SAR misreading a dry bridge deck as flooded) and found to survive it, but based on one event in one province, not asserted as a general law.
+2. **Disaster amplification.** The real January 2021 flood widened that gap from 17.2pp to 19.6pp (+2.4pp) — but this is only visible using the actual observed flood extent. A common hazard-risk proxy (BNPB InaRISK) overstates this widening by 1.7–2.6× at every penalty setting tested (a controlled sweep, not one arbitrary comparison), and produces a confounded, backwards-looking result at the aggregate level because it doesn't distinguish which of a province's flood-prone areas actually flooded in this event.
+3. **A retracted mechanism.** An early draft claimed real flood damage concentrates on structurally important network "chokepoints," based on the observed flood disconnecting more of the population than the hazard-zone proxy despite affecting fewer roads. A randomization null model built specifically to test that claim disproved it instead: all 200 of 200 random-edge-removal trials of the same size caused *more* network fragmentation than the real flood's actual pattern — the opposite of what the chokepoint hypothesis predicted. Reported here as a retraction, not salvaged or reframed. The underlying empirical comparison (observed extent disconnects more population than the proxy) still stands; the explanation for it does not, and none is currently confirmed.
 
 ## Repository structure
 

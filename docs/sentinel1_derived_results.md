@@ -2,7 +2,7 @@
 
 **Vocabulary note:** this document uses *derived* (computed from Sentinel-1 data) and *sanity-checked* (agrees qualitatively with known geography) deliberately, not *validated* (which would require comparison against an independent flood product — Copernicus EMS, UNOSAT, or similar — not yet done). See `docs/robustness_checks.md` for the full reasoning.
 
-**Status:** Complete, and corrected after review — see `docs/robustness_checks.md` for the three fixes applied (facility completeness 90→365, proxy-moderate scenario definition, chokepoint bridge-artifact audit) and why they mattered. This document reflects the corrected numbers; it supersedes the first-draft figures that circulated briefly before review.
+**Status:** Complete, and corrected after two rounds of review — see `docs/robustness_checks.md` for the fixes applied (facility completeness 90→365, proxy-moderate scenario definition, a matched-penalty sweep, and a null model that retracted the original chokepoint-mechanism claim, §7) and why they mattered. This document reflects the corrected numbers and the retraction; it supersedes the first-draft figures that circulated briefly before review.
 
 This supersedes the interim BNPB hazard-zone proxy as the primary finding for the actual January 2021 event; `docs/phase1_summary.md` and `docs/phase2_summary.md` are kept for methodological transparency (how the picture looked with the proxy, and why the proxy-vs-observed comparison is itself a result — see `docs/manuscript.md` §5.1).
 
@@ -27,13 +27,15 @@ This supersedes the interim BNPB hazard-zone proxy as the primary finding for th
 
 **Read the moderate scenario as the primary real-world estimate.** A measured, modest impact (75.3%→71.0% within 30min, a 4.3pp drop) — plausible in scale for a serious but not catastrophic-for-everyone event, consistent with BNPB's reported ~15% of population directly affected. The severe scenario remains a legitimate network-fragility stress test (see below) but is not a literal population-affected claim — real floods have informal resilience mechanisms (boats, wading, temporary detours) a binary edge-deletion graph model cannot represent.
 
-## Chokepoint finding — now audited, not just observed
+## The chokepoint claim — retracted after a null-model test (read this before citing anything about "network topology" from this project)
 
-The severe scenario disconnects more of the population (94.0%) than the equivalent proxy-based severe scenario (74.0%) despite affecting fewer roads (9.94% of edges vs. 17.3%). This pattern is unchanged by the facility-completeness fix, since it depends only on road-network topology, not on facility count.
+The severe scenario disconnects more of the population (94.0%) than the equivalent proxy-based severe scenario (74.0%) despite affecting fewer roads (9.94% of edges vs. 17.3%). **This comparison is a fact and is unaffected by what follows.** It is unchanged by the facility-completeness fix, since it depends only on road-network topology, not on facility count.
 
-**Audited against the specific artifact risk that this could be a SAR/bridge overlay error** (water detected under a bridge deck that remains physically dry and passable): of the 734 significant-road-class (trunk/primary/secondary/tertiary) edges that are both flooded and graph-theoretic chokepoints, only 9.8% (12/122 matched source ways) are OSM-tagged as bridges. Full audit in `docs/robustness_checks.md` §3. This is reassuring for the finding but doesn't fully rule out under-tagged bridges in this region's OSM data — stated as an open caveat, not resolved.
+The original draft of this document explained that comparison as evidence of a network-topology "chokepoint" mechanism — real floods concentrating on structurally critical river-crossing links. Two checks were run. First, a bridge-tagging audit: of 734 significant-road-class edges that are both flooded and graph-theoretic chokepoints, only 9.8% (12/122 matched source ways) are OSM-tagged as bridges — reassuring against a narrow *SAR-artifact* explanation (a dry bridge deck misread as flooded), and that conclusion still stands (`docs/robustness_checks.md` §3).
 
-**Framed at the appropriate confidence level for n=1 event:** the observed pattern is consistent with a general network-topology mechanism (which specific links fail matters more to connectivity than how many or how much area is affected) but this is one flood in one province — evidence consistent with the mechanism, not a demonstrated general finding. Replication across additional flood events/regions would be needed to claim generality.
+**The second check tested the mechanism itself, directly, and refuted it** (`docs/robustness_checks.md` §7): a randomization null model removed the same number of edges (55,983) chosen uniformly at random from the network, 200 times, and compared the resulting connectivity loss to the real flood's actual pattern. **All 200 of 200 random trials caused more network fragmentation** (largest surviving component 1.35–4.47%, mean 3.18%) **than the real flood's actual pattern (9.06%)** — empirical randomization p = 1.0000. This is the opposite of what the chokepoint hypothesis predicted: real, spatially-contiguous flood damage turns out to be *less* disruptive to overall connectivity than the same number of edges failing independently at random.
+
+**The chokepoint mechanism is retracted, not reframed.** The underlying empirical comparison (observed extent disconnects more population than the proxy, with fewer roads affected) still stands and is reported without a confirmed explanation — plausible unconfirmed candidates (the flood may sever the specific corridor connecting the largest population center to facilities; road-class composition differs between the two edge sets) are open questions, not claims.
 
 ## Inequality by district capacity — confirmed, confound resolved
 
@@ -42,7 +44,9 @@ The severe scenario disconnects more of the population (94.0%) than the equivale
 | Underserved | 72.8% | 70.0% | **−2.8pp** |
 | Well-served | 90.0% | 89.5% | −0.4pp |
 
-Underserved districts start from a substantially worse baseline (a standalone chronic-inequality finding) and lose disproportionately more access under real flood disruption — underserved districts lose roughly 6.5× the access, proportionally, that well-served districts do. This holds cleanly at the aggregate level using observed-extent data, without needing to exclude any district. Kota Banjarmasin (the confound with the hazard-zone proxy, where its total collapse flipped the aggregate) shows a **0.0pp change** with real data — the actual flood didn't hit its specific connecting roads the way the broad hazard-risk zone assumed it would.
+Underserved districts start from a substantially worse baseline (a standalone chronic-inequality finding: a 17.2pp gap) and lose disproportionately more access under real flood disruption — the gap widens to 19.6pp, **+2.4pp** (computed from unrounded values). This holds cleanly at the aggregate level using observed-extent data, without needing to exclude any district. Kota Banjarmasin (the confound with the hazard-zone proxy, where its total collapse flipped the aggregate) shows a **0.0pp change** with real data — the actual flood didn't hit its specific connecting roads the way the broad hazard-risk zone assumed it would.
+
+**Robustness (added after review):** a matched-penalty sweep running both proxy and observed disruption at identical multipliers shows the proxy overstates this gap-widening by 1.7–2.6× at every setting tested. A leave-one-district-out check preserved the widening direction in 13/13 runs. A workforce-denominator sensitivity check (WorldPop 2020 vs. the source document's own 2022 population) left the finding essentially unchanged despite 2 of 13 districts flipping capacity classification. Full detail: `docs/robustness_checks.md` §4, §6.
 
 **Note on the severe bracket specifically:** at the severe (binary-impassable) setting, the aggregate reverses (well-served districts show a larger pp drop, 83.3 vs. 69.1), because several well-served districts (Hulu Sungai Tengah, Kota Banjarbaru, Hulu Sungai Selatan, Balangan) happen to collapse to near-zero access under full edge removal. This reversal is specific to the unrealistic severe bracket; the moderate bracket (the primary real-world estimate) shows the expected pattern cleanly. Read this as a further reason to treat severe as a stress test, not a headline number.
 
@@ -52,7 +56,7 @@ Full per-kabupaten table: `data/processed/inequality_per_kabupaten.csv`.
 
 ## What this means for the eventual write-up
 
-The proxy-vs-real comparison across Phase 1/2 is a worthwhile methodological point independent of magnitude corrections: a general hazard-risk layer both overstates uniform disruption (confounding the inequality analysis via Banjarmasin) and misses the chokepoint-concentration effect that makes a real, geographically-specific flood more network-disruptive than its area coverage alone would suggest.
+The proxy-vs-real comparison across Phase 1/2 is this project's most defensible methodological contribution, independent of the chokepoint retraction: a general hazard-risk layer overstates uniform disruption (confounding the inequality analysis via Banjarmasin, and overstating gap-widening by 1.7–2.6× at every penalty setting tested) relative to event-specific observed data. Why the observed extent is *also* more network-disruptive than the proxy despite affecting fewer roads remains an open, unexplained empirical fact — not a mechanism this project can currently support.
 
 ## Remaining known limitations
 
