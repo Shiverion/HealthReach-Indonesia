@@ -2,7 +2,7 @@
 
 **Working title:** *Beyond Proximity: Capacity-Stratified Healthcare Accessibility Under Flood Disruption in South Kalimantan*
 **Repository / portfolio name:** HealthReach Indonesia
-**Status:** Analysis complete, including two rounds of review that caught and fixed several substantive issues — a facility undercount, a disruption-scenario bug, and (most consequentially) a randomization null model that directly refuted an early "chokepoint mechanism" claim, reported as a retraction rather than reframed. See `docs/robustness_checks.md`. Primary write-up: `docs/manuscript.md`. Current numbers: `docs/sentinel1_derived_results.md`. `docs/phase1_summary.md` and `docs/phase2_summary.md` are kept for methodological transparency (earlier interim results, both from the BNPB hazard-zone proxy and pre-review-fix).
+**Status:** Analysis complete, including two rounds of review that caught and fixed several substantive issues — a facility undercount, a disruption-scenario bug, and (most consequentially) a randomization null model that strongly contradicted an early "chokepoint mechanism" claim, reported as a retraction rather than reframed. See `docs/robustness_checks.md`. Primary write-up: `docs/manuscript.md`. Current numbers: `docs/sentinel1_derived_results.md`. `docs/phase1_summary.md` and `docs/phase2_summary.md` are kept for methodological transparency (earlier interim results, both from the BNPB hazard-zone proxy and pre-review-fix).
 
 ---
 
