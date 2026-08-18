@@ -1,0 +1,36 @@
+{
+  "title": "HealthReach Indonesia: Capacity-Stratified Healthcare Accessibility Under Flood Disruption in South Kalimantan",
+  "description": "<p>Independent replication and extension of a disaster-aware geographic healthcare accessibility methodology (Macharia et al., Kenya, 2025 preprint), applied to the January 2021 South Kalimantan, Indonesia floods. Extends the methodology with (1) a district-level healthcare workforce capacity index used to stratify accessibility results, and (2) event-specific disruption modeling from Sentinel-1 SAR-observed flood extent, compared directly against a static BNPB hazard-risk proxy under matched conditions.</p><p>Reports two findings and one retraction, in order of confidence: chronic pre-disaster inequality between low- and high-capacity districts (72.8% vs. 90.0% access within 60 minutes); disaster amplification of that gap under real flood disruption (+2.4pp, robust across a matched-penalty sweep and leave-one-district-out check, though a hazard-risk proxy systematically overstates the widening by 1.7-2.6x); and a withdrawn \"network-topology chokepoint\" mechanism that did not survive a randomization null-model test and is reported as a retraction rather than reframed.</p><p>This deposit archives the manuscript (docs/manuscript.md), full pipeline code (src/), six executed analysis notebooks (notebooks/), and the small citable result tables (data/processed/). Large raw geospatial downloads are not included; see README.md for exact reproduction steps and source URLs.</p>",
+  "creators": [
+    {
+      "name": "Izzulhaq, Muhammad Iqbal Hilmy",
+      "orcid": "0009-0009-6482-1899"
+    }
+  ],
+  "access_right": "open",
+  "license": "CC-BY-4.0",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "keywords": [
+    "healthcare accessibility",
+    "geospatial analysis",
+    "flood disruption",
+    "Sentinel-1",
+    "SAR",
+    "South Kalimantan",
+    "Indonesia",
+    "disaster response",
+    "GIS",
+    "network analysis",
+    "health equity",
+    "open science"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/Shiverion/HealthReach-Indonesia",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    }
+  ],
+  "notes": "Code is MIT-licensed (see LICENSE); manuscript and documentation text is CC BY 4.0 (see LICENSE-DOCS). The 'license' field above applies to this deposit as a whole (the manuscript being the primary artifact) — adjust per-file attribution in the deposit description if needed."
+}

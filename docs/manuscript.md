@@ -1,5 +1,7 @@
 # Beyond Proximity: Capacity-Stratified Healthcare Accessibility Under Flood Disruption in South Kalimantan, Indonesia
 
+**Muhammad Iqbal Hilmy Izzulhaq** ([ORCID: 0009-0009-6482-1899](https://orcid.org/0009-0009-6482-1899)), Independent Researcher
+
 **Status: Draft v0.3.** Independent replication and extension. Repository: [HealthReach-Indonesia](https://github.com/Shiverion/HealthReach-Indonesia). Two rounds of review changed this draft substantively, not editorially — see `docs/robustness_checks.md`. The first round fixed outright errors (a 4x facility undercount, a disruption-scenario definition bug). The second round ran a set of sensitivity checks against claims that were individually defensible but not yet earned at the confidence level they were stated with; most held up or got stronger (§4.2, §4.3), but one — the "network-topology chokepoint" mechanism originally proposed in Finding 3 — was strongly contradicted by a randomization test and is reported here as a retraction, not rescued or reframed. v0.1/v0.2 numbers are superseded and kept in `docs/phase1_summary.md` / `docs/phase2_summary.md` for the audit trail.
 
 ## Abstract
@@ -144,6 +146,16 @@ Relative to the reproduced methodology: (1) a district-level capacity-stratified
 ## 6. Data and code availability
 
 All data pipeline code, intermediate outputs, and this manuscript are at [github.com/Shiverion/HealthReach-Indonesia](https://github.com/Shiverion/HealthReach-Indonesia). Raw bulk downloads are not committed (see `.gitignore`) but reproducible from `src/`, which documents exact source URLs and access methods, including dead ends left in place as methodological notes: live Overpass API instability, GDAL OSM-driver parsing bugs, a corrupted PDF text layer, two rounds of mislocated Sentinel-1 scene selection, an under-scoped facility extraction, and an inconsistently-defined disruption scenario — see `docs/robustness_checks.md` for the last two.
+
+## 7. Declarations
+
+**Funding.** This work received no external funding.
+
+**Competing interests.** The author declares no competing interests.
+
+**Ethics.** This study uses only publicly available secondary and aggregate data (OpenStreetMap, WorldPop, Sentinel-1 SAR, published BNPB disaster situation reports, and a published provincial health-workforce profile). No individual-level human-subjects data was collected, accessed, or analyzed; no ethics board review was required or sought.
+
+**License.** Source code (`src/`, notebook code cells) is licensed under the MIT License. This manuscript and other written documentation are licensed under CC BY 4.0. See `LICENSE` and `LICENSE-DOCS` in the repository root.
 
 ## References
 

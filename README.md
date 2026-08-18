@@ -1,6 +1,12 @@
 # HealthReach Indonesia
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
+[![License: CC BY 4.0](https://img.shields.io/badge/text-CC%20BY%204.0-lightgrey.svg)](LICENSE-DOCS)
+
 Independent replication and extension of disaster-aware geographic healthcare accessibility methodology (Macharia et al., KEMRI-Wellcome/Oxford), applied to the January 2021 South Kalimantan floods, with district-level healthcare workforce capacity stratification and disruption modeled from real Sentinel-1 SAR-observed flood extent rather than a static hazard-risk proxy.
+
+**Author:** Muhammad Iqbal Hilmy Izzulhaq ([ORCID: 0009-0009-6482-1899](https://orcid.org/0009-0009-6482-1899))
 
 **Status: analysis complete.** Read the results in this order:
 
@@ -70,3 +76,17 @@ To rebuild the notebooks after any pipeline change: `python src/build_notebooks.
 ## Known limitations
 
 Full list in `docs/manuscript.md` §5.2. Headline items: facility-level (not just district-level) workforce data isn't public, so capacity *stratifies* results rather than being *integrated* into the accessibility function; the road/facility network is a current OSM snapshot applied to a 2021 event (temporal mismatch, not corrected with a historical extract); SAR water classification is exploratory-grade (no radiometric calibration, speckle filtering, or terrain correction) rather than publication-grade.
+
+## Citation
+
+If you use this work, please cite it — see `CITATION.cff`, or:
+
+```
+Izzulhaq, M. I. H. (2026). HealthReach Indonesia: Capacity-Stratified
+Healthcare Accessibility Under Flood Disruption in South Kalimantan.
+https://doi.org/10.5281/zenodo.XXXXXXX
+```
+
+## License
+
+Source code (`src/`, notebook code cells) is licensed under the [MIT License](LICENSE). The manuscript and other written documentation are licensed under [CC BY 4.0](LICENSE-DOCS).

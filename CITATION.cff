@@ -1,0 +1,47 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+type: software
+title: >-
+  HealthReach Indonesia: Capacity-Stratified Healthcare Accessibility
+  Under Flood Disruption in South Kalimantan
+authors:
+  - family-names: "Izzulhaq"
+    given-names: "Muhammad Iqbal Hilmy"
+    orcid: "https://orcid.org/0009-0009-6482-1899"
+version: "0.3.0"
+date-released: "2026-08-19"
+repository-code: "https://github.com/Shiverion/HealthReach-Indonesia"
+url: "https://github.com/Shiverion/HealthReach-Indonesia"
+license: MIT
+keywords:
+  - healthcare accessibility
+  - geospatial analysis
+  - flood disruption
+  - Sentinel-1
+  - SAR
+  - South Kalimantan
+  - Indonesia
+  - disaster response
+  - GIS
+  - network analysis
+  - health equity
+abstract: >-
+  Independent replication and extension of a disaster-aware geographic
+  healthcare accessibility methodology (Macharia et al., Kenya, 2025
+  preprint), applied to the January 2021 South Kalimantan, Indonesia
+  floods. Extends the methodology with district-level healthcare
+  workforce capacity stratification and event-specific flood disruption
+  modeling from Sentinel-1 SAR-observed extent, compared directly
+  against a static hazard-risk proxy under matched conditions.
+preferred-citation:
+  type: article
+  title: >-
+    Beyond Proximity: Capacity-Stratified Healthcare Accessibility Under
+    Flood Disruption in South Kalimantan, Indonesia
+  authors:
+    - family-names: "Izzulhaq"
+      given-names: "Muhammad Iqbal Hilmy"
+      orcid: "https://orcid.org/0009-0009-6482-1899"
+  version: "0.3.0"
+  date-released: "2026-08-19"
+  url: "https://github.com/Shiverion/HealthReach-Indonesia/blob/master/docs/manuscript.md"
