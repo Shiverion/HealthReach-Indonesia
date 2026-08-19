@@ -1,6 +1,6 @@
 # HealthReach Indonesia
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22004121.svg)](https://doi.org/10.5281/zenodo.22004121)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22004120.svg)](https://doi.org/10.5281/zenodo.22004120)
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 [![License: CC BY 4.0](https://img.shields.io/badge/text-CC%20BY%204.0-lightgrey.svg)](LICENSE-DOCS)
 
@@ -83,8 +83,10 @@ If you use this work, please cite it — see `CITATION.cff`, or:
 
 ```
 Izzulhaq, M. I. H. (2026). HealthReach Indonesia: Capacity-Stratified
-Healthcare Accessibility Under Flood Disruption in South Kalimantan.
-https://doi.org/10.5281/zenodo.22004121
+Healthcare Accessibility Under Flood Disruption in South Kalimantan
+(v0.3.1). https://doi.org/10.5281/zenodo.22004183
+
+All versions: https://doi.org/10.5281/zenodo.22004120
 ```
 
 ## License
