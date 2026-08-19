@@ -10,6 +10,7 @@ authors:
     orcid: "https://orcid.org/0009-0009-6482-1899"
 version: "0.3.0"
 date-released: "2026-08-19"
+doi: "10.5281/zenodo.22004121"
 repository-code: "https://github.com/Shiverion/HealthReach-Indonesia"
 url: "https://github.com/Shiverion/HealthReach-Indonesia"
 license: MIT
@@ -44,4 +45,5 @@ preferred-citation:
       orcid: "https://orcid.org/0009-0009-6482-1899"
   version: "0.3.0"
   date-released: "2026-08-19"
+  doi: "10.5281/zenodo.22004121"
   url: "https://github.com/Shiverion/HealthReach-Indonesia/blob/master/docs/manuscript.md"
